@@ -1,0 +1,9 @@
+{
+  "name": "Retro Pocket",
+  "short_name": "Retro Pocket",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07080b",
+  "theme_color": "#0b0d12",
+  "description": "Personal browser-based SNES player for locally selected ROM files."
+}
