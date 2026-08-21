@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0b0d12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Retro Pocket</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PERSONAL SNES PLAYER</p>
+        <h1>Retro Pocket</h1>
+      </div>
+      <span class="status" id="status">ROM未選択</span>
+    </header>
+
+    <section class="stage-card">
+      <div id="game"></div>
+      <div class="empty-state" id="emptyState">
+        <div class="console-mark">16</div>
+        <h2>SNES ROMを選択</h2>
+        <p>.sfc / .smc ファイルを端末から読み込みます。ROMはサーバーへアップロードしません。</p>
+      </div>
+    </section>
+
+    <section class="controls-card" id="launcher">
+      <input id="romInput" type="file" accept=".sfc,.smc,application/octet-stream" hidden />
+      <button class="primary" id="chooseRom" type="button">ROMを選ぶ</button>
+      <button class="secondary" id="resetApp" type="button" disabled>別のROMを選ぶ</button>
+      <p class="file-name" id="fileName">対応形式: .sfc / .smc</p>
+    </section>
+
+    <section class="notice">
+      <strong>ローカル利用向け</strong>
+      <p>自分が利用する権利を持つROMのみ使用してください。このリポジトリにはゲームデータを含めません。</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
