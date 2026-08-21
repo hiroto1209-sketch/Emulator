@@ -27,7 +27,6 @@
         <div class="stage-card fixed-stage">
           <div id="game"></div>
           <div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div>
-          <button id="gameMenuButton" class="game-menu-button" type="button" aria-label="ゲームメニューを開く"><span></span><span></span><span></span></button>
           <div class="compact-title"><strong id="nowPlaying">Game</strong></div>
         </div>
 
@@ -46,10 +45,12 @@
       <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを再開しました</strong><button id="resumeNow" type="button">再開</button></div>
 
       <div class="menu-backdrop hidden" id="menuBackdrop"></div>
-      <aside class="game-menu-drawer hidden" id="gameMenuDrawer" aria-label="ゲームメニュー">
-        <div class="drawer-head"><div><small>ゲームメニュー</small><strong id="menuGameTitle">設定・保存・チート</strong></div><button id="gameMenuClose" type="button">×</button></div>
+      <aside class="game-menu-drawer hidden" id="gameMenuDrawer" aria-label="Retro Pocket 設定">
+        <div class="drawer-head"><div><small>Retro Pocket 設定</small><strong id="menuGameTitle">ゲーム設定</strong></div><button id="gameMenuClose" type="button">×</button></div>
 
         <div class="quick-menu-grid">
+          <button id="nativePadToggle" type="button">画面内パッド OFF</button>
+          <button id="customPadToggle" type="button">下部パッド ON</button>
           <button id="turboToggle" type="button">連打 OFF</button>
           <button id="fastForwardToggle" type="button">2倍速</button>
           <button id="savePanelToggle" type="button">保存 / 読込</button>
@@ -85,7 +86,7 @@
         <section class="menu-section system-menu">
           <div class="menu-section-title"><strong>ゲーム</strong><small>ゲームデータと画面</small></div>
           <div class="drawer-actions"><button id="changeRom" type="button">別のゲームを開く</button><button id="backToLibrary" type="button">ライブラリへ戻る</button></div>
-          <p class="panel-note">アプリ内表示は日本語化しています。EmulatorJS側も日本語設定で起動します。</p>
+          <p class="panel-note">元のEmulatorJS三本線メニューから「Retro Pocket 設定」を開けます。</p>
         </section>
       </aside>
     </section>
