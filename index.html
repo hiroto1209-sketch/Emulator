@@ -35,52 +35,63 @@
         <div class="game-grid" id="recentGames"></div>
         <div class="empty-library" id="emptyLibrary"><span>🎮</span><strong>まだゲームがありません</strong><p>「ゲームを追加」から手持ちのSNES ROMを選択してください。</p></div>
       </section>
-
-      <section class="feature-grid">
-        <article><span>⚡</span><strong>Quick Resume</strong><p>前回のROMを端末内に保存し、ファイル選択なしで再開できます。</p></article>
-        <article><span>🎛️</span><strong>Controller</strong><p>専用タッチパッド・キーボード・対応ゲームパッドを利用できます。</p></article>
-        <article><span>⛶</span><strong>Fullscreen</strong><p>ゲーム画面から全画面表示へ切り替えられます。</p></article>
-        <article><span>💾</span><strong>Save</strong><p>EmulatorJSのセーブ・クイックセーブ機能を利用できます。</p></article>
-      </section>
     </section>
 
     <section id="playerView" class="player-view hidden">
-      <div class="player-header"><button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button><div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div></div>
+      <div class="player-header">
+        <button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button>
+        <div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div>
+      </div>
       <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを再開できます</strong><button id="resumeNow" type="button">タップして再開</button></div>
       <div class="stage-card"><div id="game"></div><div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div></div>
 
+      <div class="controller-toolbar">
+        <div><strong>LOW LATENCY CONTROLS</strong><small id="latencyLabel">最短入力モード</small></div>
+        <button id="layoutEditToggle" class="toolbar-button" type="button">配置設定</button>
+      </div>
+
       <section class="snes-controller" id="snesController" aria-label="SNES タッチコントローラー">
-        <div class="shoulder-row">
-          <button class="pad-btn shoulder" data-key="q" data-code="KeyQ" data-keycode="81" aria-label="L">L</button>
-          <div class="controller-label">SUPER CONTROLS</div>
-          <button class="pad-btn shoulder" data-key="w" data-code="KeyW" data-keycode="87" aria-label="R">R</button>
-        </div>
+        <div class="layout-canvas" id="layoutCanvas">
+          <div class="control-unit unit-l" data-unit="l"><button class="pad-btn shoulder" data-key="q" data-code="KeyQ" data-keycode="81" aria-label="L">L</button></div>
+          <div class="control-unit unit-r" data-unit="r"><button class="pad-btn shoulder" data-key="w" data-code="KeyW" data-keycode="87" aria-label="R">R</button></div>
 
-        <div class="controller-main">
-          <div class="dpad" aria-label="方向キー">
-            <button class="pad-btn d-up" data-key="ArrowUp" data-code="ArrowUp" data-keycode="38" aria-label="上">▲</button>
-            <button class="pad-btn d-left" data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37" aria-label="左">◀</button>
-            <div class="d-center"></div>
-            <button class="pad-btn d-right" data-key="ArrowRight" data-code="ArrowRight" data-keycode="39" aria-label="右">▶</button>
-            <button class="pad-btn d-down" data-key="ArrowDown" data-code="ArrowDown" data-keycode="40" aria-label="下">▼</button>
+          <div class="control-unit unit-dpad" data-unit="dpad">
+            <div class="dpad" aria-label="方向キー">
+              <button class="pad-btn d-up" data-key="ArrowUp" data-code="ArrowUp" data-keycode="38" aria-label="上">▲</button>
+              <button class="pad-btn d-left" data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37" aria-label="左">◀</button>
+              <div class="d-center"></div>
+              <button class="pad-btn d-right" data-key="ArrowRight" data-code="ArrowRight" data-keycode="39" aria-label="右">▶</button>
+              <button class="pad-btn d-down" data-key="ArrowDown" data-code="ArrowDown" data-keycode="40" aria-label="下">▼</button>
+            </div>
           </div>
 
-          <div class="system-buttons">
-            <button class="pad-btn system-key" data-key="Shift" data-code="ShiftRight" data-keycode="16">SELECT</button>
-            <button class="pad-btn system-key" data-key="Enter" data-code="Enter" data-keycode="13">START</button>
+          <div class="control-unit unit-system" data-unit="system">
+            <div class="system-buttons">
+              <button class="pad-btn system-key" data-key="Shift" data-code="ShiftRight" data-keycode="16">SELECT</button>
+              <button class="pad-btn system-key" data-key="Enter" data-code="Enter" data-keycode="13">START</button>
+            </div>
           </div>
 
-          <div class="face-buttons" aria-label="ABXYボタン">
-            <button class="pad-btn face face-x" data-key="s" data-code="KeyS" data-keycode="83">X</button>
-            <button class="pad-btn face face-y" data-key="a" data-code="KeyA" data-keycode="65">Y</button>
-            <button class="pad-btn face face-a" data-key="x" data-code="KeyX" data-keycode="88">A</button>
-            <button class="pad-btn face face-b" data-key="z" data-code="KeyZ" data-keycode="90">B</button>
+          <div class="control-unit unit-face" data-unit="face">
+            <div class="face-buttons" aria-label="ABXYボタン">
+              <button class="pad-btn face face-x" data-key="s" data-code="KeyS" data-keycode="83">X</button>
+              <button class="pad-btn face face-y" data-key="a" data-code="KeyA" data-keycode="65">Y</button>
+              <button class="pad-btn face face-a" data-key="x" data-code="KeyX" data-keycode="88">A</button>
+              <button class="pad-btn face face-b" data-key="z" data-code="KeyZ" data-keycode="90">B</button>
+            </div>
           </div>
         </div>
       </section>
 
+      <section class="layout-panel hidden" id="layoutPanel">
+        <div class="layout-panel-head"><div><strong>ボタン配置設定</strong><small id="orientationLabel">縦画面用</small></div><button id="layoutDone" type="button">完了</button></div>
+        <p>点線で囲まれた操作パーツをドラッグして好きな場所へ移動できます。縦・横の配置は別々に保存されます。</p>
+        <label class="size-control">全体サイズ <input id="controllerScale" type="range" min="75" max="130" value="100" step="5"><span id="scaleValue">100%</span></label>
+        <div class="layout-actions"><button id="layoutReset" type="button">初期配置に戻す</button><button id="layoutSave" class="primary-mini" type="button">この配置を保存</button></div>
+      </section>
+
       <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再読み込み</button></div>
-      <div class="tip"><strong>操作方法</strong><p>A/B/X/YはEmulatorJSへ明示的に1対1で割り当てています。別アプリから戻った時も押下状態をリセットして操作を復帰します。</p></div>
+      <div class="tip"><strong>高速操作モード</strong><p>入力はタッチ開始の瞬間にゲームへ送ります。振動・クリック待ち・視覚アニメーションを入力経路から外し、最短経路で処理します。</p></div>
     </section>
 
     <footer>Retro Pocket · Personal emulator frontend<br><small>利用する権利を持つゲームデータのみ使用してください。</small></footer>
