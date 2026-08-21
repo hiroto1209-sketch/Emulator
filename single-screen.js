@@ -10,9 +10,9 @@
 
   const setStructuredToggle=(button,label,value)=>{
     if(!button)return;
-    const span=button.querySelector('span'), b=button.querySelector('b');
-    if(span&&b){span.textContent=label;b.textContent=value;}
-    else button.textContent=`${label} ${value}`;
+    let span=button.querySelector('span'), b=button.querySelector('b');
+    if(!span||!b){button.innerHTML='';span=document.createElement('span');b=document.createElement('b');button.append(span,b);}
+    span.textContent=label;b.textContent=value;
   };
 
   function syncPlayerMode(){
@@ -21,11 +21,17 @@
     if(playing){window.scrollTo(0,0);const title=$('nowPlaying')?.textContent?.trim();if(title&&menuGameTitle)menuGameTitle.textContent=title;}
   }
   function openMenu(){
-    hideNativeMenu();
+    if(nativeMenuPanel)nativeMenuPanel.classList.add('retro-native-menu-suspended');
     drawer?.classList.remove('hidden');backdrop?.classList.remove('hidden');document.body.classList.add('menu-open');
     const title=$('nowPlaying')?.textContent?.trim();if(title&&menuGameTitle)menuGameTitle.textContent=title;
   }
-  function closeMenu(){drawer?.classList.add('hidden');backdrop?.classList.add('hidden');document.body.classList.remove('menu-open');}
+  function closeMenu(){
+    drawer?.classList.add('hidden');backdrop?.classList.add('hidden');document.body.classList.remove('menu-open');
+    if(nativeMenuPanel?.classList.contains('retro-native-menu-suspended')){
+      try{nativeMenuButton?.click();}catch{}
+      setTimeout(()=>nativeMenuPanel?.classList.remove('retro-native-menu-suspended'),60);
+    }
+  }
   closeButton?.addEventListener('click',closeMenu);backdrop?.addEventListener('click',closeMenu);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 
@@ -35,10 +41,16 @@
     nativePadToggle?.classList.toggle('active',nativePadVisible);customPadToggle?.classList.toggle('active',customPadVisible);
     setStructuredToggle(nativePadToggle,'画面内パッド',nativePadVisible?'ON':'OFF');
     setStructuredToggle(customPadToggle,'下部パッド',customPadVisible?'ON':'OFF');
-    if(!nativePadVisible) hideNativeVirtualControls();
+    if(!nativePadVisible)hideNativeVirtualControls();
   }
   nativePadToggle?.addEventListener('click',()=>{nativePadVisible=!nativePadVisible;localStorage.setItem(NATIVE_PAD_KEY,nativePadVisible?'1':'0');applyPadVisibility();});
   customPadToggle?.addEventListener('click',()=>{customPadVisible=!customPadVisible;localStorage.setItem(CUSTOM_PAD_KEY,customPadVisible?'1':'0');applyPadVisibility();});
+
+  const turbo=$('turboToggle');
+  if(turbo)new MutationObserver(()=>{
+    if(turbo.querySelector('span')&&turbo.querySelector('b'))return;
+    const on=(turbo.textContent||'').toUpperCase().includes('ON');setStructuredToggle(turbo,'連打',on?'ON':'OFF');
+  }).observe(turbo,{childList:true,subtree:true,characterData:true});
 
   $('layoutEditToggle')?.addEventListener('click',()=>requestAnimationFrame(()=>{if(snesController?.classList.contains('editing'))closeMenu();}));
 
@@ -58,11 +70,9 @@
     const unwanted=/^(select|start|fast|rewind|slow|l|r|a|b|x|y|▲|▼|◀|▶)$/i;
     gameRoot.querySelectorAll('button,[role="button"]').forEach(el=>{
       if(el===nativeMenuButton)return;
-      const text=(el.textContent||'').trim();
-      const label=`${el.getAttribute('aria-label')||''} ${el.getAttribute('title')||''}`.trim();
-      const isMenu=/menu|setting|設定/i.test(label);
-      if(isMenu)return;
-      if(unwanted.test(text)||/virtual.*gamepad|gamepad.*button|control.*button/i.test(`${el.className||''} ${el.id||''}`)) el.classList.add('retro-force-hide-native-control');
+      const text=(el.textContent||'').trim();const label=`${el.getAttribute('aria-label')||''} ${el.getAttribute('title')||''}`.trim();
+      if(/menu|setting|設定/i.test(label))return;
+      if(unwanted.test(text)||/virtual.*gamepad|gamepad.*button|control.*button/i.test(`${el.className||''} ${el.id||''}`))el.classList.add('retro-force-hide-native-control');
     });
     gameRoot.querySelectorAll('[id*="virtualGamepad"],[class*="virtualGamepad"],[class*="virtual-gamepad"]').forEach(el=>el.classList.add('retro-force-hide-native-control'));
   }
@@ -81,23 +91,18 @@
     if(!gameRoot)return null;
     const keywords=['設定','操作設定','ステート保存','全画面','チート','Settings','Controls','Save State','Fullscreen'];
     const candidates=[...gameRoot.querySelectorAll('div,section,aside')].filter(el=>{
-      if(!visible(el)||el.closest('#gameMenuDrawer'))return false;
-      const text=(el.innerText||'').slice(0,1200);return keywords.some(k=>text.includes(k))&&el.querySelectorAll('button,[role="button"]').length>=2;
+      if(!visible(el))return false;const text=(el.innerText||'').slice(0,1200);return keywords.some(k=>text.includes(k))&&el.querySelectorAll('button,[role="button"]').length>=2;
     });
     if(!candidates.length)return null;
     nativeMenuPanel=candidates.sort((a,b)=>a.getBoundingClientRect().width*a.getBoundingClientRect().height-b.getBoundingClientRect().width*b.getBoundingClientRect().height)[0];
     return nativeMenuPanel;
   }
-  function hideNativeMenu(){
-    if(nativeMenuPanel){nativeMenuPanel.classList.add('retro-native-menu-suspended');return;}
-    const p=findNativeMenuPanel();if(p)p.classList.add('retro-native-menu-suspended');
-  }
   function injectIntoNativeMenu(){
+    if(document.body.classList.contains('menu-open'))return;
     discoverNativeHamburger();const panel=findNativeMenuPanel();if(!panel||panel.querySelector('.retro-native-menu-entry'))return;
-    panel.classList.remove('retro-native-menu-suspended');
     const entry=document.createElement('button');entry.type='button';entry.className='retro-native-menu-entry';
     entry.innerHTML='<span><strong>Retro Pocket 設定</strong><br><small>保存・チート・速度・操作配置</small></span><span class="retro-arrow">›</span>';
-    entry.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();nativeMenuPanel=panel;panel.classList.add('retro-native-menu-suspended');setTimeout(openMenu,0);});
+    entry.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();nativeMenuPanel=panel;panel.classList.add('retro-native-menu-suspended');requestAnimationFrame(openMenu);});
     panel.appendChild(entry);
   }
 
@@ -106,7 +111,7 @@
     mo.observe(gameRoot,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style']});
   }
   if(player)new MutationObserver(syncPlayerMode).observe(player,{attributes:true,attributeFilter:['class']});
-  syncPlayerMode();applyPadVisibility();
+  syncPlayerMode();applyPadVisibility();setStructuredToggle(turbo,'連打','OFF');
   [250,600,1200,2400,4800].forEach(ms=>setTimeout(()=>{discoverNativeHamburger();injectIntoNativeMenu();applyPadVisibility();},ms));
   window.addEventListener('orientationchange',()=>setTimeout(()=>{if(document.body.classList.contains('player-active'))window.scrollTo(0,0);applyPadVisibility();},80));
 })();
