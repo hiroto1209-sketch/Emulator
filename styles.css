@@ -1,0 +1,123 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #07080b;
+  color: #f5f7fb;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; background: #07080b; }
+body { min-height: 100svh; }
+button, input { font: inherit; }
+
+.shell {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: calc(18px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #8f96a8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+h1 { margin: 0; font-size: clamp(28px, 7vw, 42px); letter-spacing: -.04em; }
+
+.status {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding: 8px 11px;
+  border: 1px solid #292d37;
+  border-radius: 999px;
+  background: #11141a;
+  color: #b9c0ce;
+  font-size: 12px;
+}
+
+.stage-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  border: 1px solid #222631;
+  border-radius: 24px;
+  background: #0d1016;
+  box-shadow: 0 24px 70px rgba(0,0,0,.35);
+}
+
+#game { width: 100%; min-height: 260px; aspect-ratio: 4 / 3; }
+#game:empty { display: none; }
+
+.empty-state {
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  padding: 34px;
+}
+
+.empty-state.hidden { display: none; }
+.console-mark {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  margin-bottom: 18px;
+  border: 1px solid #343946;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #1a1f2a, #0b0e13);
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.empty-state h2 { margin: 0 0 8px; font-size: 23px; }
+.empty-state p, .notice p { margin: 0; color: #929aaa; line-height: 1.65; font-size: 14px; }
+
+.controls-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+button {
+  min-height: 52px;
+  border-radius: 16px;
+  border: 0;
+  font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled { opacity: .45; cursor: default; }
+.primary { background: #f4f6fa; color: #090b0f; }
+.secondary { background: #171b23; color: #e8ebf1; border: 1px solid #2b303b; }
+.file-name { grid-column: 1 / -1; margin: 3px 3px 0; color: #7f8797; font-size: 12px; overflow-wrap: anywhere; }
+
+.notice {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #1f232c;
+  border-radius: 18px;
+  background: #0b0e13;
+}
+.notice strong { display: block; margin-bottom: 5px; font-size: 13px; }
+
+@media (max-width: 560px) {
+  .shell { padding-left: 12px; padding-right: 12px; }
+  .stage-card { border-radius: 20px; }
+  .empty-state { min-height: 300px; padding: 24px; }
+  .controls-card { grid-template-columns: 1fr; }
+  .file-name { grid-column: 1; }
+}
