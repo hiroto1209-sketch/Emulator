@@ -1,0 +1,27 @@
+/* Gameplay mode: one viewport, no page scroll. */
+body.player-active{overflow:hidden;overscroll-behavior:none;touch-action:manipulation;background:#050608}
+body.player-active .shell{width:100%;max-width:none;height:100dvh;margin:0;padding:0}
+body.player-active .topbar,body.player-active footer{display:none!important}
+.fixed-player{position:fixed;inset:0;z-index:20;width:100%;height:100dvh;padding:calc(env(safe-area-inset-top) + 4px) max(6px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 4px) max(6px,env(safe-area-inset-left));background:#050608;overflow:hidden}
+.play-surface{height:100%;display:grid;grid-template-rows:minmax(0,56%) minmax(0,44%);gap:4px}
+.fixed-stage{height:100%!important;min-height:0!important;border-radius:18px!important;overflow:hidden;position:relative;background:#000}
+.fixed-stage #game{height:100%!important;min-height:0!important;width:100%}
+.fixed-controller{height:100%;min-height:0!important;margin:0!important;padding:0!important;border-radius:18px!important;overflow:hidden;background:#090c11}
+.fixed-controller .layout-canvas{height:100%!important;min-height:0!important;border-radius:18px!important}
+.compact-title{position:absolute;left:10px;top:10px;z-index:15;max-width:55%;padding:5px 8px;border-radius:9px;background:rgba(5,6,8,.62);backdrop-filter:blur(8px);pointer-events:none;opacity:.72}
+.compact-title strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:#dfe3ea}
+.game-menu-button{position:absolute;right:10px;top:10px;z-index:80;width:48px;height:44px;padding:9px 10px;border:1px solid rgba(255,255,255,.2);border-radius:13px;background:rgba(10,12,16,.82);backdrop-filter:blur(12px);display:flex;flex-direction:column;justify-content:center;gap:5px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.game-menu-button span{display:block;width:100%;height:3px;border-radius:999px;background:#f2f4f8}
+.resume-banner{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 12px);z-index:100;transform:translateX(-50%);width:min(88vw,420px);margin:0!important}
+.menu-backdrop{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.52);backdrop-filter:blur(2px)}
+.game-menu-drawer{position:fixed;z-index:210;right:0;top:0;width:min(92vw,460px);height:100dvh;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto;overscroll-behavior:contain;background:#0b0e13;border-left:1px solid #2b303b;box-shadow:-30px 0 80px rgba(0,0,0,.45)}
+.drawer-head{position:sticky;top:calc(env(safe-area-inset-top) * -1);z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-4px -2px 12px;padding:8px 2px 12px;background:linear-gradient(#0b0e13 72%,rgba(11,14,19,0))}
+.drawer-head small,.menu-section-title small{display:block;color:#858e9e;font-size:10px;margin-bottom:3px}.drawer-head strong{font-size:19px}.drawer-head button{width:42px;height:42px;border:1px solid #303642;border-radius:50%;background:#151922;color:#fff;font-size:25px}
+.quick-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.quick-menu-grid button,.menu-section button,.drawer-actions button{min-height:46px;border:1px solid #303642;border-radius:13px;background:#141820;color:#f1f3f7;font-weight:850}.quick-menu-grid button.active{background:#eff2f7;color:#0b0d12}
+.menu-section{margin-top:10px;padding:13px;border:1px solid #252b35;border-radius:17px;background:#0e1218}.menu-section-title{margin-bottom:10px}.menu-section-title strong{display:block;font-size:14px}.drawer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.system-menu{margin-bottom:8px}
+.game-menu-drawer .save-grid{grid-template-columns:1fr!important}.game-menu-drawer .cheat-grid{grid-template-columns:1fr!important}.game-menu-drawer .tool-panel,.game-menu-drawer .layout-panel{margin:0;padding:0;border:0;background:transparent}.game-menu-drawer .panel-note{font-size:11px;line-height:1.6}.game-menu-drawer .wide-action{margin-top:8px}
+/* The native EmulatorJS hamburger sits in the same corner. Our app menu is intentionally above it. */
+.fixed-stage .ejs_menu_button,.fixed-stage [class*="menu-button"]{z-index:20!important}
+@media(orientation:landscape) and (pointer:coarse){.play-surface{grid-template-rows:minmax(0,63%) minmax(0,37%)}.fixed-stage,.fixed-controller{border-radius:14px!important}.fixed-controller .layout-canvas{min-height:0!important}.compact-title{top:7px;left:7px}.game-menu-button{top:7px;right:7px;width:46px;height:40px}.game-menu-drawer{width:min(58vw,520px)}}
+@media(max-width:600px) and (orientation:portrait){.play-surface{grid-template-rows:minmax(0,48%) minmax(0,52%)}.fixed-player{padding-left:4px;padding-right:4px}.fixed-stage,.fixed-controller{border-radius:13px!important}.game-menu-button{right:7px;top:7px}}
+@supports not (height:100dvh){.fixed-player,.game-menu-drawer,body.player-active .shell{height:100vh}}
