@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#090a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Retro Pocket</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><p class="eyebrow">MY RETRO LIBRARY</p><h1>Retro Pocket</h1></div>
+      <span class="status" id="status">準備完了</span>
+    </header>
+
+    <section id="libraryView">
+      <div class="hero">
+        <p class="hero-kicker">YOUR GAMES. YOUR DEVICE.</p>
+        <h2>手持ちのゲームを、<br>ひとつのライブラリに。</h2>
+        <p>ROMは端末から直接読み込みます。ゲームデータをこのリポジトリへ保存する必要はありません。</p>
+        <button class="primary hero-button" id="chooseRom" type="button">＋ ゲームを追加</button>
+        <input id="romInput" type="file" accept=".sfc,.smc,.fig,.gd3,.gd7,.dx2,.bsx,.swc,application/octet-stream" hidden />
+      </div>
+
+      <section class="section-block">
+        <div class="section-title"><h3>最近プレイしたゲーム</h3><button class="text-button" id="clearHistory" type="button">履歴を消去</button></div>
+        <div class="game-grid" id="recentGames"></div>
+        <div class="empty-library" id="emptyLibrary"><span>🎮</span><strong>まだゲームがありません</strong><p>「ゲームを追加」から手持ちのSNES ROMを選択してください。</p></div>
+      </section>
+
+      <section class="feature-grid">
+        <article><span>💾</span><strong>Save States</strong><p>EmulatorJSのセーブステート機能を利用できます。</p></article>
+        <article><span>🎛️</span><strong>Controller</strong><p>タッチ操作・キーボード・対応ゲームパッドを利用できます。</p></article>
+        <article><span>⛶</span><strong>Fullscreen</strong><p>ゲーム画面から全画面表示へ切り替えられます。</p></article>
+        <article><span>⚙️</span><strong>Game Tools</strong><p>一時停止、再起動、設定などをゲーム内メニューから操作できます。</p></article>
+      </section>
+    </section>
+
+    <section id="playerView" class="player-view hidden">
+      <div class="player-header"><button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button><div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div></div>
+      <div class="stage-card"><div id="game"></div><div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div></div>
+      <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再読み込み</button></div>
+      <div class="tip"><strong>ゲーム内ツール</strong><p>セーブ/ロード、全画面、操作設定などはEmulatorJSのゲーム画面メニューから利用できます。</p></div>
+    </section>
+
+    <footer>Retro Pocket · Personal emulator frontend<br><small>利用する権利を持つゲームデータのみ使用してください。</small></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
