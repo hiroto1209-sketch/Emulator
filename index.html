@@ -34,7 +34,7 @@
 
       <section class="feature-grid">
         <article><span>💾</span><strong>Save States</strong><p>EmulatorJSのセーブステート機能を利用できます。</p></article>
-        <article><span>🎛️</span><strong>Controller</strong><p>タッチ操作・キーボード・対応ゲームパッドを利用できます。</p></article>
+        <article><span>🎛️</span><strong>Controller</strong><p>専用タッチパッド・キーボード・対応ゲームパッドを利用できます。</p></article>
         <article><span>⛶</span><strong>Fullscreen</strong><p>ゲーム画面から全画面表示へ切り替えられます。</p></article>
         <article><span>⚙️</span><strong>Game Tools</strong><p>一時停止、再起動、設定などをゲーム内メニューから操作できます。</p></article>
       </section>
@@ -43,8 +43,39 @@
     <section id="playerView" class="player-view hidden">
       <div class="player-header"><button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button><div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div></div>
       <div class="stage-card"><div id="game"></div><div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div></div>
+
+      <section class="snes-controller" id="snesController" aria-label="SNES タッチコントローラー">
+        <div class="shoulder-row">
+          <button class="pad-btn shoulder" data-key="q" data-code="KeyQ" data-keycode="81" aria-label="L">L</button>
+          <div class="controller-label">SUPER CONTROLS</div>
+          <button class="pad-btn shoulder" data-key="w" data-code="KeyW" data-keycode="87" aria-label="R">R</button>
+        </div>
+
+        <div class="controller-main">
+          <div class="dpad" aria-label="方向キー">
+            <button class="pad-btn d-up" data-key="ArrowUp" data-code="ArrowUp" data-keycode="38" aria-label="上">▲</button>
+            <button class="pad-btn d-left" data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37" aria-label="左">◀</button>
+            <div class="d-center"></div>
+            <button class="pad-btn d-right" data-key="ArrowRight" data-code="ArrowRight" data-keycode="39" aria-label="右">▶</button>
+            <button class="pad-btn d-down" data-key="ArrowDown" data-code="ArrowDown" data-keycode="40" aria-label="下">▼</button>
+          </div>
+
+          <div class="system-buttons">
+            <button class="pad-btn system-key" data-key="Shift" data-code="ShiftRight" data-keycode="16">SELECT</button>
+            <button class="pad-btn system-key" data-key="Enter" data-code="Enter" data-keycode="13">START</button>
+          </div>
+
+          <div class="face-buttons" aria-label="ABXYボタン">
+            <button class="pad-btn face face-x" data-key="s" data-code="KeyS" data-keycode="83">X</button>
+            <button class="pad-btn face face-y" data-key="a" data-code="KeyA" data-keycode="65">Y</button>
+            <button class="pad-btn face face-a" data-key="x" data-code="KeyX" data-keycode="88">A</button>
+            <button class="pad-btn face face-b" data-key="z" data-code="KeyZ" data-keycode="90">B</button>
+          </div>
+        </div>
+      </section>
+
       <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再読み込み</button></div>
-      <div class="tip"><strong>ゲーム内ツール</strong><p>セーブ/ロード、全画面、操作設定などはEmulatorJSのゲーム画面メニューから利用できます。</p></div>
+      <div class="tip"><strong>操作方法</strong><p>画面下の専用コントローラーはゲーム映像と重ならないよう独立配置しています。縦・横画面に合わせて自動でレイアウトが変わります。</p></div>
     </section>
 
     <footer>Retro Pocket · Personal emulator frontend<br><small>利用する権利を持つゲームデータのみ使用してください。</small></footer>
