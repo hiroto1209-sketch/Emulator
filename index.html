@@ -9,33 +9,88 @@
   <title>Retro Pocket</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="controller-v2.css" />
+  <link rel="stylesheet" href="controller-v3.css" />
 </head>
 <body>
   <main class="shell">
     <header class="topbar"><div><p class="eyebrow">MY RETRO LIBRARY</p><h1>Retro Pocket</h1></div><span class="status" id="status">準備完了</span></header>
+
     <section id="libraryView">
-      <div class="hero"><p class="hero-kicker">YOUR GAMES. YOUR DEVICE.</p><h2>手持ちのゲームを、<br>ひとつのライブラリに。</h2><p>ROMはこの端末のブラウザ内に保存できます。次回から毎回ファイルを選び直す必要はありません。</p><div class="hero-actions"><button class="primary hero-button hidden" id="continueGame" type="button">▶ 前回のゲームを続ける</button><button class="secondary hero-button" id="chooseRom" type="button">＋ ゲームを追加</button></div><p class="cached-game hidden" id="cachedGameInfo"></p><input id="romInput" type="file" accept=".sfc,.smc,.fig,.gd3,.gd7,.dx2,.bsx,.swc,application/octet-stream" hidden /></div>
-      <section class="section-block"><div class="section-title"><h3>最近プレイしたゲーム</h3><button class="text-button" id="clearHistory" type="button">履歴を消去</button></div><div class="game-grid" id="recentGames"></div><div class="empty-library" id="emptyLibrary"><span>🎮</span><strong>まだゲームがありません</strong><p>「ゲームを追加」から手持ちのSNES ROMを選択してください。</p></div></section>
+      <div class="hero">
+        <p class="hero-kicker">YOUR GAMES. YOUR DEVICE.</p>
+        <h2>手持ちのゲームを、<br>ひとつのライブラリに。</h2>
+        <p>一度選んだROMはこの端末のブラウザ内に保存できます。次回からファイル選択なしで続けられます。</p>
+        <div class="hero-actions"><button class="primary hero-button hidden" id="continueGame" type="button">▶ 前回のゲームを続ける</button><button class="secondary hero-button" id="chooseRom" type="button">＋ ゲームを追加</button></div>
+        <p class="cached-game hidden" id="cachedGameInfo"></p>
+        <input id="romInput" type="file" accept=".sfc,.smc,.fig,.gd3,.gd7,.dx2,.bsx,.swc,application/octet-stream" hidden />
+      </div>
+      <section class="section-block"><div class="section-title"><h3>最近プレイしたゲーム</h3><button class="text-button" id="clearHistory" type="button">履歴を消去</button></div><div class="game-grid" id="recentGames"></div><div class="empty-library" id="emptyLibrary"><span>🎮</span><strong>まだゲームがありません</strong><p>「ゲームを追加」からSNES ROMを選択してください。</p></div></section>
     </section>
+
     <section id="playerView" class="player-view hidden">
       <div class="player-header"><button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button><div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div></div>
-      <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを再開できます</strong><button id="resumeNow" type="button">タップして再開</button></div>
+      <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを復帰しました</strong><button id="resumeNow" type="button">操作を再接続</button></div>
       <div class="stage-card"><div id="game"></div><div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div></div>
-      <div class="controller-toolbar"><div><strong>LOW LATENCY CONTROLS</strong><small id="latencyLabel">最短入力モード</small></div><button id="layoutEditToggle" class="toolbar-button" type="button">配置設定</button></div>
-      <section class="snes-controller" id="snesController" aria-label="SNES タッチコントローラー"><div class="layout-canvas" id="layoutCanvas">
-        <div class="control-unit unit-l" data-unit="l"><button class="pad-btn shoulder" data-key="q" data-code="KeyQ" data-keycode="81" aria-label="L">L</button></div>
-        <div class="control-unit unit-r" data-unit="r"><button class="pad-btn shoulder" data-key="w" data-code="KeyW" data-keycode="87" aria-label="R">R</button></div>
-        <div class="control-unit unit-dpad" data-unit="dpad"><div class="dpad"><button class="pad-btn d-up" data-key="ArrowUp" data-code="ArrowUp" data-keycode="38">▲</button><button class="pad-btn d-left" data-key="ArrowLeft" data-code="ArrowLeft" data-keycode="37">◀</button><div class="d-center"></div><button class="pad-btn d-right" data-key="ArrowRight" data-code="ArrowRight" data-keycode="39">▶</button><button class="pad-btn d-down" data-key="ArrowDown" data-code="ArrowDown" data-keycode="40">▼</button></div></div>
-        <div class="control-unit unit-system" data-unit="system"><div class="system-buttons"><button class="pad-btn system-key" data-key="Shift" data-code="ShiftRight" data-keycode="16">SELECT</button><button class="pad-btn system-key" data-key="Enter" data-code="Enter" data-keycode="13">START</button></div></div>
-        <div class="control-unit unit-face" data-unit="face"><div class="face-buttons"><button class="pad-btn face face-x" data-key="s" data-code="KeyS" data-keycode="83">X</button><button class="pad-btn face face-y" data-key="a" data-code="KeyA" data-keycode="65">Y</button><button class="pad-btn face face-a" data-key="x" data-code="KeyX" data-keycode="88">A</button><button class="pad-btn face face-b" data-key="z" data-code="KeyZ" data-keycode="90">B</button></div></div>
-      </div></section>
-      <section class="layout-panel hidden" id="layoutPanel"><div class="layout-panel-head"><div><strong>ボタン配置設定</strong><small id="orientationLabel">縦画面用</small></div><button id="layoutDone" type="button">完了</button></div><p>点線で囲まれた操作パーツをドラッグして好きな場所へ移動できます。縦・横の配置は別々に保存されます。</p><label class="size-control">全体サイズ <input id="controllerScale" type="range" min="75" max="130" value="100" step="5"><span id="scaleValue">100%</span></label><div class="layout-actions"><button id="layoutReset" type="button">初期配置に戻す</button><button id="layoutSave" class="primary-mini" type="button">この配置を保存</button></div></section>
-      <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再読み込み</button></div>
-      <div class="tip"><strong>高速操作モード</strong><p>入力はタッチ開始の瞬間にゲームへ送ります。振動・クリック待ち・視覚アニメーションを入力経路から外し、最短経路で処理します。</p></div>
+
+      <div class="pro-toolbar">
+        <button id="layoutEditToggle" type="button">配置設定</button>
+        <button id="savePanelToggle" type="button">SAVE</button>
+        <button id="cheatPanelToggle" type="button">CHEATS</button>
+        <button id="turboToggle" type="button">TURBO OFF</button>
+        <button id="fastForwardToggle" type="button">2× SPEED</button>
+      </div>
+
+      <section class="snes-controller pro-controller" id="snesController" aria-label="SNES タッチコントローラー">
+        <div class="layout-canvas" id="layoutCanvas">
+          <div class="control-unit unit-l" data-unit="l"><button class="pad-btn shoulder" data-input="10">L</button></div>
+          <div class="control-unit unit-r" data-unit="r"><button class="pad-btn shoulder" data-input="11">R</button></div>
+
+          <div class="control-unit unit-stick" data-unit="stick">
+            <div class="analog-stick" id="analogStick" aria-label="アナログスティック"><div class="stick-ring"></div><div class="stick-knob" id="stickKnob"></div></div>
+          </div>
+
+          <div class="control-unit unit-dpad" data-unit="dpad"><div class="dpad">
+            <button class="pad-btn d-up" data-input="4">▲</button><button class="pad-btn d-left" data-input="6">◀</button><div class="d-center"></div><button class="pad-btn d-right" data-input="7">▶</button><button class="pad-btn d-down" data-input="5">▼</button>
+          </div></div>
+
+          <div class="control-unit unit-system" data-unit="system"><div class="system-buttons"><button class="pad-btn system-key" data-input="2">SELECT</button><button class="pad-btn system-key" data-input="3">START</button></div></div>
+
+          <div class="control-unit unit-face" data-unit="face"><div class="face-buttons">
+            <button class="pad-btn face face-x" data-input="9">X</button><button class="pad-btn face face-y" data-input="1">Y</button><button class="pad-btn face face-a" data-input="8" data-turbo="true">A</button><button class="pad-btn face face-b" data-input="0" data-turbo="true">B</button>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="layout-panel hidden" id="layoutPanel">
+        <div class="layout-panel-head"><div><strong>ボタン配置設定</strong><small id="orientationLabel">縦画面用</small></div><button id="layoutDone" type="button">完了</button></div>
+        <p>十字キー・スティック・ABXY・START/SELECT・L/Rをドラッグして自由配置できます。縦・横は別々に保存します。</p>
+        <label class="size-control">全体サイズ <input id="controllerScale" type="range" min="70" max="140" value="100" step="5"><span id="scaleValue">100%</span></label>
+        <div class="layout-actions"><button id="layoutReset" type="button">初期配置</button><button id="layoutSave" class="primary-mini" type="button">保存</button></div>
+      </section>
+
+      <section class="tool-panel hidden" id="savePanel">
+        <div class="tool-panel-head"><div><strong>SAVE STATES</strong><small>端末内保存・ワンタップ復元</small></div><button data-close-panel="savePanel">閉じる</button></div>
+        <div class="save-grid">
+          <article><strong>スロット 1</strong><small id="slot1Status">未保存</small><div><button data-save-slot="1">保存</button><button data-load-slot="1">読込</button></div></article>
+          <article><strong>スロット 2</strong><small id="slot2Status">未保存</small><div><button data-save-slot="2">保存</button><button data-load-slot="2">読込</button></div></article>
+          <article><strong>スロット 3</strong><small id="slot3Status">未保存</small><div><button data-save-slot="3">保存</button><button data-load-slot="3">読込</button></div></article>
+        </div>
+        <button class="wide-action" id="loadAutoResume" type="button">直前の自動復帰ポイントを読み込む</button>
+      </section>
+
+      <section class="tool-panel hidden" id="cheatPanel">
+        <div class="tool-panel-head"><div><strong>EARTHBOUND QUICK CHEATS</strong><small>タップでON / OFF</small></div><button data-close-panel="cheatPanel">閉じる</button></div>
+        <div class="cheat-grid" id="cheatGrid"></div>
+        <button class="wide-action danger-lite" id="disableAllCheats" type="button">すべてのチートをOFF</button>
+        <p class="panel-note">「開始時」と書かれたものは新しいゲーム開始前にONにすると確実です。一部の強力なコードは進行を壊す可能性があるため、先にステート保存を推奨します。</p>
+      </section>
+
+      <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再起動</button></div>
+      <div class="tip"><strong>PRO CONTROL</strong><p>操作はEmulatorJSのGameManagerへ直接送信します。別アプリへ移動すると自動ステートを保存し、復帰時にエミュレーションループを再開します。</p></div>
     </section>
+
     <footer>Retro Pocket · Personal emulator frontend<br><small>利用する権利を持つゲームデータのみ使用してください。</small></footer>
   </main>
-  <script src="app.js"></script>
+  <script src="app-v3.js"></script>
 </body>
 </html>
