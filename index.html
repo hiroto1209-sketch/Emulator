@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="controller-v2.css" />
   <link rel="stylesheet" href="controller-v3.css" />
   <link rel="stylesheet" href="single-screen.css" />
+  <link rel="stylesheet" href="precision-controls.css" />
 </head>
 <body>
   <main class="shell">
@@ -32,12 +33,12 @@
 
         <section class="snes-controller pro-controller fixed-controller" id="snesController" aria-label="SNES タッチコントローラー">
           <div class="layout-canvas" id="layoutCanvas">
-            <div class="control-unit unit-l" data-unit="l"><button class="pad-btn shoulder" data-input="10" aria-label="L">L</button></div>
-            <div class="control-unit unit-r" data-unit="r"><button class="pad-btn shoulder" data-input="11" aria-label="R">R</button></div>
-            <div class="control-unit unit-stick" data-unit="stick"><div class="analog-stick" id="analogStick"><div class="stick-ring"></div><div class="stick-knob" id="stickKnob"></div></div></div>
-            <div class="control-unit unit-dpad" data-unit="dpad"><div class="dpad"><button class="pad-btn d-up" data-input="4">▲</button><button class="pad-btn d-left" data-input="6">◀</button><div class="d-center"></div><button class="pad-btn d-right" data-input="7">▶</button><button class="pad-btn d-down" data-input="5">▼</button></div></div>
-            <div class="control-unit unit-system" data-unit="system"><div class="system-buttons"><button class="pad-btn system-key" data-input="2">選択</button><button class="pad-btn system-key" data-input="3">開始</button></div></div>
-            <div class="control-unit unit-face" data-unit="face"><div class="face-buttons"><button class="pad-btn face face-x" data-input="9">X</button><button class="pad-btn face face-y" data-input="1">Y</button><button class="pad-btn face face-a" data-input="8" data-turbo="true">A</button><button class="pad-btn face face-b" data-input="0" data-turbo="true">B</button></div></div>
+            <div class="control-unit unit-l" data-unit="l"><button class="pad-btn shoulder" data-input="10" data-control="l" aria-label="L">L</button></div>
+            <div class="control-unit unit-r" data-unit="r"><button class="pad-btn shoulder" data-input="11" data-control="r" aria-label="R">R</button></div>
+            <div class="control-unit unit-stick" data-unit="stick"><div class="analog-stick" id="analogStick" data-control="stick"><div class="stick-ring"></div><div class="stick-knob" id="stickKnob"></div></div></div>
+            <div class="control-unit unit-dpad" data-unit="dpad"><div class="dpad"><button class="pad-btn d-up" data-input="4" data-control="up">▲</button><button class="pad-btn d-left" data-input="6" data-control="left">◀</button><div class="d-center"></div><button class="pad-btn d-right" data-input="7" data-control="right">▶</button><button class="pad-btn d-down" data-input="5" data-control="down">▼</button></div></div>
+            <div class="control-unit unit-system" data-unit="system"><div class="system-buttons"><button class="pad-btn system-key" data-input="2" data-control="select">選択</button><button class="pad-btn system-key" data-input="3" data-control="start">開始</button></div></div>
+            <div class="control-unit unit-face" data-unit="face"><div class="face-buttons"><button class="pad-btn face face-x" data-input="9" data-control="x">X</button><button class="pad-btn face face-y" data-input="1" data-control="y">Y</button><button class="pad-btn face face-a" data-input="8" data-control="a" data-turbo="true">A</button><button class="pad-btn face face-b" data-input="0" data-control="b" data-turbo="true">B</button></div></div>
           </div>
         </section>
       </div>
@@ -46,20 +47,29 @@
 
       <div class="menu-backdrop hidden" id="menuBackdrop"></div>
       <aside class="game-menu-drawer hidden" id="gameMenuDrawer" aria-label="Retro Pocket 設定">
-        <div class="drawer-head"><div><small>Retro Pocket 設定</small><strong id="menuGameTitle">ゲーム設定</strong></div><button id="gameMenuClose" type="button">×</button></div>
+        <div class="drawer-head"><div><small>RETRO POCKET</small><strong id="menuGameTitle">ゲーム設定</strong><p>プレイに必要な機能をここに集約</p></div><button id="gameMenuClose" type="button" aria-label="閉じる">×</button></div>
 
-        <div class="quick-menu-grid">
-          <button id="nativePadToggle" type="button">画面内パッド OFF</button>
-          <button id="customPadToggle" type="button">下部パッド ON</button>
-          <button id="turboToggle" type="button">連打 OFF</button>
-          <button id="fastForwardToggle" type="button">2倍速</button>
-          <button id="savePanelToggle" type="button">保存 / 読込</button>
-          <button id="cheatPanelToggle" type="button">チート</button>
-          <button id="layoutEditToggle" type="button">操作配置</button>
-          <button id="reloadGame" type="button">ゲーム再起動</button>
-        </div>
+        <section class="menu-group menu-group-quick">
+          <div class="menu-group-label"><span>クイック操作</span><small>よく使う機能</small></div>
+          <div class="quick-menu-grid">
+            <button id="nativePadToggle" type="button"><span>画面内パッド</span><b>OFF</b></button>
+            <button id="customPadToggle" type="button"><span>下部パッド</span><b>ON</b></button>
+            <button id="turboToggle" type="button"><span>連打</span><b>OFF</b></button>
+            <button id="fastForwardToggle" type="button"><span>ゲーム速度</span><b>2倍速</b></button>
+          </div>
+        </section>
 
-        <section class="menu-section" id="savePanel">
+        <section class="menu-group">
+          <div class="menu-group-label"><span>ゲーム機能</span><small>保存・チート・操作</small></div>
+          <div class="feature-menu-list">
+            <button id="savePanelToggle" type="button"><span><b>保存 / 読込</b><small>3つのスロットと自動復帰</small></span><i>›</i></button>
+            <button id="cheatPanelToggle" type="button"><span><b>チート</b><small>ワンタップでON / OFF</small></span><i>›</i></button>
+            <button id="layoutEditToggle" type="button"><span><b>操作配置</b><small>移動・ピンチで個別サイズ変更</small></span><i>›</i></button>
+            <button id="reloadGame" type="button"><span><b>ゲーム再起動</b><small>現在のROMを再起動</small></span><i>↻</i></button>
+          </div>
+        </section>
+
+        <section class="menu-section hidden" id="savePanel">
           <div class="menu-section-title"><strong>保存ステート</strong><small>ゲームの好きな瞬間を保存・復元</small></div>
           <div class="save-grid">
             <article><strong>スロット 1</strong><small id="slotStatus1">未保存</small><div><button data-save-slot="1">保存</button><button data-load-slot="1">読込</button></div></article>
@@ -76,17 +86,17 @@
         </section>
 
         <section class="menu-section hidden" id="layoutPanel">
-          <div class="menu-section-title"><strong>コントローラー配置</strong><small id="orientationLabel">縦画面用</small></div>
-          <p class="panel-note">メニューを閉じると編集状態になります。操作パーツをドラッグして配置を変更できます。</p>
+          <div class="menu-section-title"><strong>操作配置の編集</strong><small id="orientationLabel">縦画面用</small></div>
+          <div class="gesture-guide"><div><b>1本指</b><span>各ボタンをドラッグして移動</span></div><div><b>2本指</b><span>ピンチでそのボタンだけ拡大・縮小</span></div></div>
+          <p class="panel-note">L/R、方向キー4つ、A/B/X/Y、選択、開始、スティックを個別調整できます。縦画面と横画面は別々に保存されます。</p>
           <label class="size-control">全体サイズ <input id="controllerScale" type="range" min="70" max="135" value="100" step="5"><span id="scaleValue">100%</span></label>
-          <div class="layout-actions"><button id="layoutReset" type="button">初期配置</button><button id="layoutSave" class="primary-mini" type="button">配置を保存</button></div>
+          <div class="layout-actions"><button id="layoutReset" type="button">すべて初期配置</button><button id="layoutSave" class="primary-mini" type="button">配置を保存</button></div>
           <button class="wide-action" id="layoutDone" type="button">編集を終了</button>
         </section>
 
-        <section class="menu-section system-menu">
-          <div class="menu-section-title"><strong>ゲーム</strong><small>ゲームデータと画面</small></div>
-          <div class="drawer-actions"><button id="changeRom" type="button">別のゲームを開く</button><button id="backToLibrary" type="button">ライブラリへ戻る</button></div>
-          <p class="panel-note">元のEmulatorJS三本線メニューから「Retro Pocket 設定」を開けます。</p>
+        <section class="menu-group system-menu">
+          <div class="menu-group-label"><span>その他</span><small>ゲームデータ</small></div>
+          <div class="drawer-actions"><button id="changeRom" type="button">別のゲーム</button><button id="backToLibrary" type="button">ライブラリ</button></div>
         </section>
       </aside>
     </section>
@@ -95,5 +105,6 @@
   </main>
   <script src="app-v3.js"></script>
   <script src="single-screen.js"></script>
+  <script src="precision-controls.js"></script>
 </body>
 </html>
