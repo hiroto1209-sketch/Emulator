@@ -21,8 +21,12 @@
       <div class="hero">
         <p class="hero-kicker">YOUR GAMES. YOUR DEVICE.</p>
         <h2>手持ちのゲームを、<br>ひとつのライブラリに。</h2>
-        <p>ROMは端末から直接読み込みます。ゲームデータをこのリポジトリへ保存する必要はありません。</p>
-        <button class="primary hero-button" id="chooseRom" type="button">＋ ゲームを追加</button>
+        <p>ROMはこの端末のブラウザ内に保存できます。次回から毎回ファイルを選び直す必要はありません。</p>
+        <div class="hero-actions">
+          <button class="primary hero-button hidden" id="continueGame" type="button">▶ 前回のゲームを続ける</button>
+          <button class="secondary hero-button" id="chooseRom" type="button">＋ ゲームを追加</button>
+        </div>
+        <p class="cached-game hidden" id="cachedGameInfo"></p>
         <input id="romInput" type="file" accept=".sfc,.smc,.fig,.gd3,.gd7,.dx2,.bsx,.swc,application/octet-stream" hidden />
       </div>
 
@@ -33,15 +37,16 @@
       </section>
 
       <section class="feature-grid">
-        <article><span>💾</span><strong>Save States</strong><p>EmulatorJSのセーブステート機能を利用できます。</p></article>
+        <article><span>⚡</span><strong>Quick Resume</strong><p>前回のROMを端末内に保存し、ファイル選択なしで再開できます。</p></article>
         <article><span>🎛️</span><strong>Controller</strong><p>専用タッチパッド・キーボード・対応ゲームパッドを利用できます。</p></article>
         <article><span>⛶</span><strong>Fullscreen</strong><p>ゲーム画面から全画面表示へ切り替えられます。</p></article>
-        <article><span>⚙️</span><strong>Game Tools</strong><p>一時停止、再起動、設定などをゲーム内メニューから操作できます。</p></article>
+        <article><span>💾</span><strong>Save</strong><p>EmulatorJSのセーブ・クイックセーブ機能を利用できます。</p></article>
       </section>
     </section>
 
     <section id="playerView" class="player-view hidden">
       <div class="player-header"><button class="back-button" id="backToLibrary" type="button">‹ ライブラリ</button><div><p class="eyebrow">NOW PLAYING</p><h2 id="nowPlaying">Game</h2></div></div>
+      <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを再開できます</strong><button id="resumeNow" type="button">タップして再開</button></div>
       <div class="stage-card"><div id="game"></div><div class="loading-state" id="loadingState"><div class="spinner"></div><strong>ゲームを準備しています</strong><p id="fileName"></p></div></div>
 
       <section class="snes-controller" id="snesController" aria-label="SNES タッチコントローラー">
@@ -75,7 +80,7 @@
       </section>
 
       <div class="player-actions"><button class="secondary" id="changeRom" type="button">別のゲームを開く</button><button class="secondary" id="reloadGame" type="button">ゲームを再読み込み</button></div>
-      <div class="tip"><strong>操作方法</strong><p>画面下の専用コントローラーはゲーム映像と重ならないよう独立配置しています。縦・横画面に合わせて自動でレイアウトが変わります。</p></div>
+      <div class="tip"><strong>操作方法</strong><p>A/B/X/YはEmulatorJSへ明示的に1対1で割り当てています。別アプリから戻った時も押下状態をリセットして操作を復帰します。</p></div>
     </section>
 
     <footer>Retro Pocket · Personal emulator frontend<br><small>利用する権利を持つゲームデータのみ使用してください。</small></footer>
