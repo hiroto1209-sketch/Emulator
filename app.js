@@ -12,6 +12,7 @@ const emptyLibrary = document.getElementById('emptyLibrary');
 const nowPlaying = document.getElementById('nowPlaying');
 const fileName = document.getElementById('fileName');
 const status = document.getElementById('status');
+const snesController = document.getElementById('snesController');
 
 const HISTORY_KEY = 'retro-pocket-history-v1';
 const supported = ['sfc','smc','fig','gd3','gd7','dx2','bsx','swc'];
@@ -26,6 +27,7 @@ backToLibrary.addEventListener('click', () => window.location.reload());
 clearHistory.addEventListener('click', () => { localStorage.removeItem(HISTORY_KEY); renderHistory(); });
 romInput.addEventListener('change', (e) => { const file = e.target.files?.[0]; if (file) bootRom(file); });
 
+setupTouchController();
 renderHistory();
 
 function bootRom(file) {
@@ -47,8 +49,6 @@ function bootRom(file) {
   status.textContent = 'ROM読込中…';
   showLoading('ゲームを準備しています', 'iPhone / iPad向けの安定モードで起動しています。');
 
-  // EmulatorJS公式デモと同じ方式。iOS Safariでblob: URLを経由させず、
-  // File(Blob)そのものを渡すことでROM読み込み失敗を避ける。
   window.EJS_player = '#game';
   window.EJS_core = 'snes';
   window.EJS_gameName = title;
@@ -67,19 +67,8 @@ function bootRom(file) {
   window.EJS_backgroundColor = '#000';
   window.EJS_askBeforeExit = false;
 
-  // SNES専用のタッチコントローラー。EmulatorJSの公開設定APIだけを使用。
-  window.EJS_VirtualGamepadSettings = [
-    { type:'dpad', location:'left', left:'48%', right:'52%', joystickInput:false, inputValues:[4,5,6,7] },
-    { type:'button', text:'Y', id:'snes-y', location:'right', left:18, top:44, bold:true, input_value:9 },
-    { type:'button', text:'X', id:'snes-x', location:'right', left:68, top:4, bold:true, input_value:1 },
-    { type:'button', text:'B', id:'snes-b', location:'right', left:68, top:84, bold:true, input_value:8 },
-    { type:'button', text:'A', id:'snes-a', location:'right', left:118, top:44, bold:true, input_value:0 },
-    { type:'button', text:'L', id:'snes-l', location:'top', left:16, top:8, fontSize:16, block:true, input_value:10 },
-    { type:'button', text:'R', id:'snes-r', location:'top', right:16, top:8, fontSize:16, block:true, input_value:11 },
-    { type:'button', text:'SELECT', id:'snes-select', location:'center', left:-62, fontSize:13, block:true, input_value:2 },
-    { type:'button', text:'START', id:'snes-start', location:'center', left:18, fontSize:13, block:true, input_value:3 }
-  ];
-
+  // アプリ側に専用パッドを置くため、EmulatorJS内蔵の仮想パッド設定には依存しない。
+  // キーボード標準マッピングを使うので、外付けキーボード/ゲームパッドとも共存できる。
   window.EJS_ready = () => {
     status.textContent = 'エミュレータ準備完了';
     showLoading('ROMを起動しています', '最初の画面が出るまで数秒かかることがあります。');
@@ -89,14 +78,13 @@ function bootRom(file) {
     emulatorStarted = true;
     clearTimeout(bootTimer);
     loadingState.classList.add('hidden');
+    snesController.classList.add('ready');
     status.textContent = 'プレイ中';
   };
 
   window.EJS_onExit = () => {
     status.textContent = '終了';
   };
-
-  window.EJS_DEBUG_XX = false;
 
   const oldLoader = document.querySelector('script[data-retro-pocket-loader]');
   if (oldLoader) oldLoader.remove();
@@ -107,13 +95,75 @@ function bootRom(file) {
   loader.onerror = () => showBootError('EmulatorJSの読み込みに失敗しました。通信状態を確認して再読み込みしてください。');
   document.body.appendChild(loader);
 
-  // 黒画面で止まった場合に、何も起きていないように見えないよう診断を表示。
   bootTimer = setTimeout(() => {
     if (!emulatorStarted) {
       status.textContent = '起動確認中';
-      showLoading('まだ起動していません', '画面中央またはゲーム画面を一度タップしてください。改善しない場合は「再読み込み」を押してください。', true);
+      showLoading('まだ起動していません', 'ゲーム画面を一度タップしてください。改善しない場合は「再読み込み」を押してください。', true);
     }
   }, 12000);
+}
+
+function setupTouchController() {
+  if (!snesController) return;
+
+  snesController.addEventListener('contextmenu', (e) => e.preventDefault());
+  snesController.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+  document.querySelectorAll('.pad-btn').forEach((button) => {
+    button.style.touchAction = 'none';
+
+    const press = (event) => {
+      event.preventDefault();
+      if (button.setPointerCapture && event.pointerId !== undefined) {
+        try { button.setPointerCapture(event.pointerId); } catch {}
+      }
+      button.classList.add('pressed');
+      emitKey(button, 'keydown');
+    };
+
+    const release = (event) => {
+      event.preventDefault();
+      button.classList.remove('pressed');
+      emitKey(button, 'keyup');
+    };
+
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('lostpointercapture', release);
+  });
+
+  window.addEventListener('blur', releaseAllControls);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) releaseAllControls();
+  });
+}
+
+function emitKey(button, type) {
+  const key = button.dataset.key;
+  const code = button.dataset.code;
+  const keyCode = Number(button.dataset.keycode || 0);
+  const eventInit = { key, code, bubbles: true, cancelable: true, repeat: false };
+
+  const makeEvent = () => {
+    const evt = new KeyboardEvent(type, eventInit);
+    // 一部エミュレータコアはkeyCode/whichを参照するため互換値も持たせる。
+    try { Object.defineProperty(evt, 'keyCode', { get: () => keyCode }); } catch {}
+    try { Object.defineProperty(evt, 'which', { get: () => keyCode }); } catch {}
+    return evt;
+  };
+
+  document.dispatchEvent(makeEvent());
+  window.dispatchEvent(makeEvent());
+  const canvas = document.querySelector('#game canvas');
+  if (canvas) canvas.dispatchEvent(makeEvent());
+}
+
+function releaseAllControls() {
+  document.querySelectorAll('.pad-btn.pressed').forEach((button) => {
+    button.classList.remove('pressed');
+    emitKey(button, 'keyup');
+  });
 }
 
 function showLoading(title, message, warning = false) {
