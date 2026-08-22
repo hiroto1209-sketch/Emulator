@@ -19,20 +19,10 @@ body.player-active .topbar,body.player-active footer{display:none!important}
 .menu-section{margin-top:10px;padding:13px;border:1px solid #252b35;border-radius:17px;background:#0e1218}.menu-section-title{margin-bottom:10px}.menu-section-title strong{display:block;font-size:14px}.drawer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.system-menu{margin-bottom:8px}
 .game-menu-drawer .save-grid{grid-template-columns:1fr!important}.game-menu-drawer .cheat-grid{grid-template-columns:1fr!important}.game-menu-drawer .tool-panel,.game-menu-drawer .layout-panel{margin:0;padding:0;border:0;background:transparent}.game-menu-drawer .panel-note{font-size:11px;line-height:1.6}.game-menu-drawer .wide-action{margin-top:8px}
 
-/* EmulatorJS native virtual pad: hidden by default on touch devices, menu button remains untouched. */
-#game.retro-native-pad-off #ejs_virtualGamepad_left,
-#game.retro-native-pad-off #ejs_virtualGamepad_right,
-#game.retro-native-pad-off .ejs_virtualGamepad_left,
-#game.retro-native-pad-off .ejs_virtualGamepad_right{display:none!important;visibility:hidden!important;pointer-events:none!important}
-
-/* Retro Pocket lower controller can also be hidden from the native menu. */
-body.custom-pad-off .play-surface{grid-template-rows:minmax(0,100%) 0;gap:0}
-body.custom-pad-off #snesController{display:none!important}
-
-/* Entry injected into EmulatorJS's own menu. */
-.retro-native-menu-entry{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;width:calc(100% - 12px)!important;min-height:44px!important;margin:6px!important;padding:9px 12px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(18,22,30,.94)!important;color:#fff!important;font:700 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;box-sizing:border-box!important}
-.retro-native-menu-entry small{opacity:.62;font-size:10px}.retro-native-menu-entry strong{font-size:13px}.retro-native-menu-entry .retro-arrow{font-size:18px;opacity:.7}
-
+#game.retro-native-pad-off #ejs_virtualGamepad_left,#game.retro-native-pad-off #ejs_virtualGamepad_right,#game.retro-native-pad-off .ejs_virtualGamepad_left,#game.retro-native-pad-off .ejs_virtualGamepad_right{display:none!important;visibility:hidden!important;pointer-events:none!important}
+body.custom-pad-off .play-surface{grid-template-rows:minmax(0,100%) 0;gap:0}body.custom-pad-off #snesController{display:none!important}
+.retro-native-menu-entry{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;width:calc(100% - 12px)!important;min-height:44px!important;margin:6px!important;padding:9px 12px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(18,22,30,.94)!important;color:#fff!important;font:700 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;box-sizing:border-box!important}.retro-native-menu-entry small{opacity:.62;font-size:10px}.retro-native-menu-entry strong{font-size:13px}.retro-native-menu-entry .retro-arrow{font-size:18px;opacity:.7}
+.retro-fallback-menu-button{position:absolute;right:12px;top:12px;z-index:90;width:46px;height:42px;padding:9px 10px;border:1px solid rgba(255,255,255,.2);border-radius:13px;background:rgba(10,12,16,.84);backdrop-filter:blur(12px);display:flex;flex-direction:column;justify-content:center;gap:5px;box-shadow:0 8px 24px rgba(0,0,0,.35)}.retro-fallback-menu-button span{display:block;width:100%;height:3px;border-radius:999px;background:#f2f4f8}.retro-fallback-menu-button.hidden{display:none!important}
 @media(orientation:landscape) and (pointer:coarse){.play-surface{grid-template-rows:minmax(0,63%) minmax(0,37%)}.fixed-stage,.fixed-controller{border-radius:14px!important}.fixed-controller .layout-canvas{min-height:0!important}.compact-title{top:7px;left:7px}.game-menu-drawer{width:min(58vw,520px)}body.custom-pad-off .play-surface{grid-template-rows:100% 0}}
-@media(max-width:600px) and (orientation:portrait){.play-surface{grid-template-rows:minmax(0,48%) minmax(0,52%)}.fixed-player{padding-left:4px;padding-right:4px}.fixed-stage,.fixed-controller{border-radius:13px!important}body.custom-pad-off .play-surface{grid-template-rows:100% 0}}
+@media(max-width:600px) and (orientation:portrait){.play-surface{grid-template-rows:minmax(0,48%) minmax(0,52%)}.fixed-player{padding-left:4px;padding-right:4px}.fixed-stage,.fixed-controller{border-radius:13px!important}.retro-fallback-menu-button{right:8px;top:8px}body.custom-pad-off .play-surface{grid-template-rows:100% 0}}
 @supports not (height:100dvh){.fixed-player,.game-menu-drawer,body.player-active .shell{height:100vh}}
