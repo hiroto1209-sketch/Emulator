@@ -6,7 +6,7 @@
   const NATIVE_PAD_KEY='retro-pocket-native-pad-v1', CUSTOM_PAD_KEY='retro-pocket-custom-pad-v1';
   let nativePadVisible=localStorage.getItem(NATIVE_PAD_KEY)==='1';
   let customPadVisible=localStorage.getItem(CUSTOM_PAD_KEY)!=='0';
-  let nativeMenuButton=null, nativeMenuPanel=null;
+  let nativeMenuButton=null, nativeMenuPanel=null, enhanceQueued=false;
 
   const setStructuredToggle=(button,label,value)=>{
     if(!button)return;
@@ -35,29 +35,32 @@
   closeButton?.addEventListener('click',closeMenu);backdrop?.addEventListener('click',closeMenu);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 
-  function showNativeVirtualControls(){gameRoot?.querySelectorAll('.retro-force-hide-native-control').forEach(el=>el.classList.remove('retro-force-hide-native-control'));}
+  function showNativeVirtualControls(){
+    gameRoot?.querySelectorAll('.retro-force-hide-native-control').forEach(el=>el.classList.remove('retro-force-hide-native-control'));
+  }
   function hideNativeVirtualControls(){
     if(!gameRoot)return;
     const unwanted=/^(select|start|fast|rewind|slow|l|r|a|b|x|y|▲|▼|◀|▶)$/i;
+    const mark=(el)=>{if(el&&el!==nativeMenuButton&&!el.classList.contains('retro-force-hide-native-control'))el.classList.add('retro-force-hide-native-control');};
     gameRoot.querySelectorAll('button,[role="button"]').forEach(el=>{
       if(el===nativeMenuButton)return;
-      const text=(el.textContent||'').trim();const label=`${el.getAttribute('aria-label')||''} ${el.getAttribute('title')||''}`.trim();
-      if(/menu|setting|設定/i.test(label))return;
-      if(unwanted.test(text)||/virtual.*gamepad|gamepad.*button|control.*button/i.test(`${el.className||''} ${el.id||''}`))el.classList.add('retro-force-hide-native-control');
-    });
-    gameRoot.querySelectorAll('div,span').forEach(el=>{
       const text=(el.textContent||'').trim();
-      if(!unwanted.test(text))return;
-      const target=el.closest('button,[role="button"]')||el;
-      if(target!==nativeMenuButton)target.classList.add('retro-force-hide-native-control');
+      const label=`${el.getAttribute('aria-label')||''} ${el.getAttribute('title')||''}`.trim();
+      if(/menu|setting|設定/i.test(label))return;
+      if(unwanted.test(text)||/virtual.*gamepad|gamepad.*button|control.*button/i.test(`${el.className||''} ${el.id||''}`))mark(el);
     });
-    gameRoot.querySelectorAll('[id*="virtualGamepad"],[class*="virtualGamepad"],[class*="virtual-gamepad"]').forEach(el=>el.classList.add('retro-force-hide-native-control'));
+    gameRoot.querySelectorAll('[id*="virtualGamepad"],[class*="virtualGamepad"],[class*="virtual-gamepad"]').forEach(mark);
+    gameRoot.querySelectorAll('div,span').forEach(el=>{
+      if(!unwanted.test((el.textContent||'').trim()))return;
+      mark(el.closest('button,[role="button"]')||el);
+    });
   }
   function applyPadVisibility(){
     gameRoot?.classList.toggle('retro-native-pad-off',!nativePadVisible);
     document.body.classList.toggle('custom-pad-off',!customPadVisible);
     nativePadToggle?.classList.toggle('active',nativePadVisible);customPadToggle?.classList.toggle('active',customPadVisible);
-    setStructuredToggle(nativePadToggle,'画面内パッド',nativePadVisible?'ON':'OFF');setStructuredToggle(customPadToggle,'下部パッド',customPadVisible?'ON':'OFF');
+    setStructuredToggle(nativePadToggle,'画面内パッド',nativePadVisible?'ON':'OFF');
+    setStructuredToggle(customPadToggle,'下部パッド',customPadVisible?'ON':'OFF');
     if(nativePadVisible)showNativeVirtualControls();else hideNativeVirtualControls();
   }
   nativePadToggle?.addEventListener('click',()=>{nativePadVisible=!nativePadVisible;localStorage.setItem(NATIVE_PAD_KEY,nativePadVisible?'1':'0');applyPadVisibility();});
@@ -95,9 +98,28 @@
     entry.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();nativeMenuPanel=panel;panel.classList.add('retro-native-menu-suspended');requestAnimationFrame(openMenu);});panel.appendChild(entry);
   }
 
-  if(gameRoot){const mo=new MutationObserver(()=>{translateNode(gameRoot);discoverNativeHamburger();injectIntoNativeMenu();applyPadVisibility();});mo.observe(gameRoot,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','style']});}
+  function enhanceNativeUi(){
+    enhanceQueued=false;
+    if(!gameRoot)return;
+    translateNode(gameRoot);
+    discoverNativeHamburger();
+    injectIntoNativeMenu();
+    applyPadVisibility();
+  }
+  function queueEnhance(){
+    if(enhanceQueued)return;
+    enhanceQueued=true;
+    requestAnimationFrame(enhanceNativeUi);
+  }
+
+  // 重要: class/styleの変更は監視しない。
+  // 自分で付ける非表示classを再検知するとSafariで更新ループになり、EmulatorJS起動を阻害するため。
+  if(gameRoot){
+    const mo=new MutationObserver(queueEnhance);
+    mo.observe(gameRoot,{childList:true,subtree:true,characterData:true});
+  }
   if(player)new MutationObserver(syncPlayerMode).observe(player,{attributes:true,attributeFilter:['class']});
   syncPlayerMode();applyPadVisibility();setStructuredToggle(turbo,'連打','OFF');
-  [250,600,1200,2400,4800].forEach(ms=>setTimeout(()=>{discoverNativeHamburger();injectIntoNativeMenu();applyPadVisibility();},ms));
-  window.addEventListener('orientationchange',()=>setTimeout(()=>{if(document.body.classList.contains('player-active'))window.scrollTo(0,0);applyPadVisibility();},80));
+  [250,600,1200,2400,4800].forEach(ms=>setTimeout(queueEnhance,ms));
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{if(document.body.classList.contains('player-active'))window.scrollTo(0,0);queueEnhance();},80));
 })();
