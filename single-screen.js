@@ -52,7 +52,6 @@
   function showNativeVirtualControls(){gameRoot?.querySelectorAll('.retro-force-hide-native-control').forEach(el=>el.classList.remove('retro-force-hide-native-control'));}
   function hideNativeVirtualControls(){
     if(!gameRoot)return;
-    // Only hide exact gamepad buttons. Never infer from broad class names; that previously hid the hamburger too.
     const unwanted=/^(select|start|fast|rewind|slow|l|r|a|b|x|y|▲|▼|◀|▶)$/i;
     gameRoot.querySelectorAll('.retro-force-hide-native-control').forEach(el=>el.classList.remove('retro-force-hide-native-control'));
     gameRoot.querySelectorAll('button,[role="button"]').forEach(el=>{
@@ -121,4 +120,8 @@
   syncPlayerMode();ensureFallbackButton();applyPadVisibility();setStructuredToggle(turbo,'連打','OFF');
   [250,600,1200,2400,4800,8000].forEach(ms=>setTimeout(queueEnhance,ms));
   window.addEventListener('orientationchange',()=>setTimeout(()=>{if(document.body.classList.contains('player-active'))window.scrollTo(0,0);queueEnhance();},80));
+
+  // Experimental English study mode. Loaded separately so it cannot block emulator startup.
+  const studyCss=document.createElement('link');studyCss.rel='stylesheet';studyCss.href='english-study.css';document.head.appendChild(studyCss);
+  const studyScript=document.createElement('script');studyScript.src='english-study.js';studyScript.defer=true;document.body.appendChild(studyScript);
 })();
