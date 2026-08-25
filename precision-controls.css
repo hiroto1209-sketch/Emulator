@@ -9,11 +9,18 @@
 .feature-menu-list{display:grid;gap:7px}.feature-menu-list button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:59px;padding:10px 12px;border:1px solid #29313d;border-radius:14px;background:#131820;color:#f5f7fb;text-align:left}.feature-menu-list button span b,.feature-menu-list button span small{display:block}.feature-menu-list button span b{font-size:13px}.feature-menu-list button span small{margin-top:3px;color:#788395;font-size:10px}.feature-menu-list button i{font-style:normal;font-size:22px;color:#687386}
 .game-menu-drawer .menu-section{margin-top:10px!important;padding:12px!important;background:#11161e!important;border-color:#29313d!important}.game-menu-drawer .save-grid article{background:#0c1117!important}.gesture-guide{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.gesture-guide div{padding:10px;border:1px solid #29313d;border-radius:12px;background:#0b1016}.gesture-guide b,.gesture-guide span{display:block}.gesture-guide b{font-size:12px}.gesture-guide span{margin-top:3px;color:#7f8999;font-size:9px;line-height:1.45}
 
-/* Precision layout editor */
+/* Controller v5: every editable control is now a direct canvas child. */
+.v5-legacy-host{display:none!important}
+.v5-control-shell{position:absolute!important;z-index:3;transform-origin:center center!important;touch-action:none!important;will-change:left,top,transform!important}
+.v5-control-shell>.v5-flat-control{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;inset:auto!important;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;margin:0!important;transform:none;transform-origin:center center!important;box-sizing:border-box!important}
+.v5-control-shell>.analog-stick{display:block!important}
+.v5-control-shell>.pad-btn{display:block!important}
+
+/* Editing feedback lives on the shell, not on nested button geometry. */
 #snesController.editing .layout-canvas{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)!important;background-size:20px 20px!important}
-#snesController.editing [data-control]{outline:1.5px solid rgba(132,114,255,.9)!important;outline-offset:5px!important;box-shadow:0 0 0 7px rgba(119,101,255,.08)!important;touch-action:none!important;cursor:grab!important;will-change:transform!important}
-#snesController.editing [data-control].precision-active{outline-color:#fff!important;box-shadow:0 0 0 8px rgba(126,104,255,.2),0 8px 30px rgba(0,0,0,.45)!important;z-index:999!important}
-#snesController.editing [data-control]::after{content:attr(data-size-label);position:absolute;left:50%;top:-18px;transform:translateX(-50%);padding:2px 5px;border-radius:6px;background:#7764ff;color:#fff;font-size:8px;font-weight:900;white-space:nowrap;pointer-events:none}
-#analogStick[data-control]{transform-origin:center!important}.pad-btn[data-control]{transform-origin:center!important}
+#snesController.editing .v5-control-shell{outline:1.5px solid rgba(132,114,255,.9)!important;outline-offset:5px!important;box-shadow:0 0 0 7px rgba(119,101,255,.08)!important;cursor:grab!important}
+#snesController.editing .v5-control-shell.precision-active{outline-color:#fff!important;box-shadow:0 0 0 8px rgba(126,104,255,.2),0 8px 30px rgba(0,0,0,.45)!important;z-index:999!important;cursor:grabbing!important}
+#snesController.editing .v5-control-shell>.v5-flat-control::after{content:attr(data-size-label);position:absolute;left:50%;top:-18px;transform:translateX(-50%);padding:2px 5px;border-radius:6px;background:#7764ff;color:#fff;font-size:8px;font-weight:900;white-space:nowrap;pointer-events:none}
 .precision-edit-toast{position:fixed;z-index:2147483002;left:50%;bottom:calc(env(safe-area-inset-bottom) + 10px);transform:translateX(-50%);padding:9px 13px;border:1px solid #434b5c;border-radius:999px;background:rgba(10,13,18,.94);color:#fff;font-size:10px;font-weight:800;pointer-events:none;white-space:nowrap}
+
 @media(max-width:420px){.game-menu-drawer{width:100vw!important}.quick-menu-grid button{min-height:62px!important}.drawer-head strong{font-size:20px!important}.gesture-guide{grid-template-columns:1fr}}
