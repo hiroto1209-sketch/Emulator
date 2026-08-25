@@ -3,119 +3,173 @@
   const canvas=document.getElementById('layoutCanvas');
   if(!controller||!canvas)return;
 
-  const PREFIX='retro-pocket-precision-layout-v3-';
+  // v4 intentionally does not migrate the old mixed px/% layouts.
+  const PREFIX='retro-pocket-precision-layout-v4-';
   const controls=[...controller.querySelectorAll('[data-control]')];
-  let toast=null,active=null,raf=0;
   const pointers=new Map();
+  let state={},defaultsState={},active=null,raf=0,toast=null,resizeTimer=0;
 
   const orientation=()=>matchMedia('(orientation: landscape)').matches?'landscape':'portrait';
   const storageKey=()=>PREFIX+orientation();
   const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
-  const defaults=()=>Object.fromEntries(controls.map(el=>[el.dataset.control,{dx:0,dy:0,scale:1}]));
-  function load(){try{return {...defaults(),...(JSON.parse(localStorage.getItem(storageKey()))||{})};}catch{return defaults();}}
-  let state=load();
+  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const midpoint=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
 
-  function parentRenderScale(el){
-    const unit=el.closest('.control-unit');if(!unit)return 1;
-    const rect=unit.getBoundingClientRect(),w=unit.offsetWidth||rect.width,h=unit.offsetHeight||rect.height;
-    const sx=w?rect.width/w:1,sy=h?rect.height/h:1,s=(sx+sy)/2;
+  // app-v3 still owns menu/open-close state, but its old group dragger must never run.
+  function disableLegacyGroupEditor(){
+    controller.querySelectorAll('.control-unit').forEach(unit=>{
+      unit.onpointerdown=null;
+      unit.onpointermove=null;
+      unit.onpointerup=null;
+      unit.onpointercancel=null;
+      unit.onlostpointercapture=null;
+    });
+  }
+
+  function canvasRect(){return canvas.getBoundingClientRect();}
+  function centerOf(el){const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};}
+  function ancestorScale(el){
+    const unit=el.closest('.control-unit')||el.parentElement;
+    if(!unit)return 1;
+    const r=unit.getBoundingClientRect(),w=unit.offsetWidth||r.width,h=unit.offsetHeight||r.height;
+    const sx=w?r.width/w:1,sy=h?r.height/h:1,s=(sx+sy)/2;
     return Number.isFinite(s)&&s>.05?s:1;
   }
-  function centerOf(el){const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};}
-  function applyOne(el){const s=state[el.dataset.control]||{dx:0,dy:0,scale:1};el.style.transform=`translate3d(${s.dx}px,${s.dy}px,0) scale(${s.scale})`;el.dataset.sizeLabel=`${Math.round(s.scale*100)}%`;}
-  function applyAll(){controls.forEach(applyOne);} function save(){localStorage.setItem(storageKey(),JSON.stringify(state));}
-  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);const midpoint=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  function toNormalized(point){
+    const r=canvasRect();
+    return{x:clamp((point.x-r.left)/Math.max(1,r.width),0,1),y:clamp((point.y-r.top)/Math.max(1,r.height),0,1)};
+  }
+  function fromNormalized(p){const r=canvasRect();return{x:r.left+p.x*r.width,y:r.top+p.y*r.height};}
 
-  function showToast(){if(toast)return;toast=document.createElement('div');toast.className='precision-edit-toast';toast.textContent='1本指で移動 ・ 2本指の中点を中心に拡大縮小';document.body.appendChild(toast);}
+  function readNaturalCenters(){
+    const saved=controls.map(el=>el.style.transform);
+    controls.forEach(el=>el.style.transform='none');
+    const out={};
+    controls.forEach(el=>{out[el.dataset.control]={...toNormalized(centerOf(el)),scale:1};});
+    controls.forEach((el,i)=>el.style.transform=saved[i]);
+    return out;
+  }
+  function load(){
+    try{
+      const v=JSON.parse(localStorage.getItem(storageKey()));
+      if(v&&v.version===4&&v.controls)return v.controls;
+    }catch{}
+    return JSON.parse(JSON.stringify(defaultsState));
+  }
+  function save(){localStorage.setItem(storageKey(),JSON.stringify({version:4,controls:state}));}
+
+  function applyOne(el){
+    const s=state[el.dataset.control];if(!s)return;
+    // Measure the element's untransformed center, then translate it to the normalized target.
+    const old=el.style.transform;el.style.transform='none';
+    const natural=centerOf(el),target=fromNormalized(s),ps=ancestorScale(el);
+    el.style.transform=old;
+    const dx=(target.x-natural.x)/ps,dy=(target.y-natural.y)/ps;
+    el.style.transform=`translate3d(${dx}px,${dy}px,0) scale(${s.scale||1})`;
+    el.dataset.sizeLabel=`${Math.round((s.scale||1)*100)}%`;
+  }
+  function applyAll(){controls.forEach(applyOne);}
+
+  function showToast(){
+    if(toast)return;
+    toast=document.createElement('div');toast.className='precision-edit-toast';
+    toast.textContent='指に吸い付くように移動 ・ 2本指でサイズ変更';
+    document.body.appendChild(toast);
+  }
   function hideToast(){toast?.remove();toast=null;}
 
   function beginDrag(el,p){
-    const s=state[el.dataset.control]||{dx:0,dy:0,scale:1};
-    const c=centerOf(el),ps=parentRenderScale(el);
-    active={el,id:el.dataset.control,mode:'drag',parentScale:ps,start:{pointer:{...p},center:c,grabOffset:{x:c.x-p.x,y:c.y-p.y},dx:s.dx,dy:s.dy,scale:s.scale}};
+    const id=el.dataset.control,s=state[id];if(!s)return;
+    const center=centerOf(el);
+    active={el,id,mode:'drag',grabOffset:{x:center.x-p.x,y:center.y-p.y}};
     el.classList.add('precision-active');
   }
-
   function beginPinch(){
+    if(!active||pointers.size<2)return;
+    const pts=[...pointers.values()],a=pts[0],b=pts[1],mid=midpoint(a,b),s=state[active.id],center=centerOf(active.el);
+    active.mode='pinch';
+    active.pinch={distance:Math.max(10,distance(a,b)),startScale:s.scale||1,startMid:mid,startCenter:center,centerFromMid:{x:center.x-mid.x,y:center.y-mid.y}};
+  }
+  function rebaseDrag(){
     if(!active)return;
-    const pts=[...pointers.values()];if(pts.length<2)return;
-    const s=state[active.id],a=pts[0],b=pts[1],mid=midpoint(a,b),c=centerOf(active.el);
-    active.mode='pinch';active.parentScale=parentRenderScale(active.el);
-    active.start={distance:Math.max(8,distance(a,b)),mid,center:c,centerFromMid:{x:c.x-mid.x,y:c.y-mid.y},dx:s.dx,dy:s.dy,scale:s.scale};
+    if(pointers.size>=2){beginPinch();return;}
+    const p=[...pointers.values()][0];if(!p)return;
+    const c=centerOf(active.el);active.mode='drag';active.grabOffset={x:c.x-p.x,y:c.y-p.y};delete active.pinch;
   }
 
-  function rebaseToRemainingPointer(){
-    if(!active)return;
-    const pts=[...pointers.values()];
-    if(pts.length>=2){beginPinch();return;}
-    if(pts.length===1){
-      const p=pts[0],s=state[active.id],c=centerOf(active.el);
-      active.mode='drag';active.parentScale=parentRenderScale(active.el);
-      active.start={pointer:{...p},center:c,grabOffset:{x:c.x-p.x,y:c.y-p.y},dx:s.dx,dy:s.dy,scale:s.scale};
-    }
-  }
-
-  function updateActive(){
+  function update(){
     raf=0;if(!active||!controller.classList.contains('editing'))return;
-    const pts=[...pointers.values()],s=state[active.id]||{dx:0,dy:0,scale:1},ps=active.parentScale||1;
+    const pts=[...pointers.values()],s=state[active.id];if(!s)return;
     if(pts.length>=2){
-      if(active.mode!=='pinch')beginPinch();
-      const a=pts[0],b=pts[1],mid=midpoint(a,b),ratio=distance(a,b)/active.start.distance;
-      const nextScale=clamp(active.start.scale*ratio,.5,2);
-      const effectiveRatio=nextScale/active.start.scale;
-      const targetCenter={
-        x:mid.x+active.start.centerFromMid.x*effectiveRatio,
-        y:mid.y+active.start.centerFromMid.y*effectiveRatio
-      };
-      s.scale=nextScale;
-      s.dx=active.start.dx+(targetCenter.x-active.start.center.x)/ps;
-      s.dy=active.start.dy+(targetCenter.y-active.start.center.y)/ps;
+      if(active.mode!=='pinch'||!active.pinch)beginPinch();
+      const a=pts[0],b=pts[1],mid=midpoint(a,b),pin=active.pinch;
+      const nextScale=clamp(pin.startScale*(distance(a,b)/pin.distance),.45,2.25);
+      const ratio=nextScale/pin.startScale;
+      // Scale around the two-finger midpoint, not around the element's CSS origin.
+      const targetCenter={x:mid.x+pin.centerFromMid.x*ratio,y:mid.y+pin.centerFromMid.y*ratio};
+      const n=toNormalized(targetCenter);s.x=n.x;s.y=n.y;s.scale=nextScale;
     }else if(pts.length===1){
-      if(active.mode!=='drag')rebaseToRemainingPointer();
-      const p=pts[0];
-      const targetCenter={x:p.x+active.start.grabOffset.x,y:p.y+active.start.grabOffset.y};
-      s.dx=active.start.dx+(targetCenter.x-active.start.center.x)/ps;
-      s.dy=active.start.dy+(targetCenter.y-active.start.center.y)/ps;
+      if(active.mode!=='drag')rebaseDrag();
+      const p=pts[0],target={x:p.x+active.grabOffset.x,y:p.y+active.grabOffset.y},n=toNormalized(target);
+      s.x=n.x;s.y=n.y;
     }
-    state[active.id]=s;applyOne(active.el);
+    applyOne(active.el);
   }
-  function queueUpdate(){if(!raf)raf=requestAnimationFrame(updateActive);}
+  const queue=()=>{if(!raf)raf=requestAnimationFrame(update);};
 
   canvas.addEventListener('pointerdown',e=>{
     if(!controller.classList.contains('editing'))return;
-    const hit=e.target.closest?.('[data-control]');if(!active&&!hit)return;
-    e.preventDefault();e.stopPropagation();
+    const hit=e.target.closest?.('[data-control]');
+    if(!active&&!hit)return;
+    e.preventDefault();e.stopImmediatePropagation();
     try{canvas.setPointerCapture(e.pointerId);}catch{}
     pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(!active)beginDrag(hit,pointers.get(e.pointerId));
     else if(pointers.size>=2)beginPinch();
   },{capture:true,passive:false});
-
   canvas.addEventListener('pointermove',e=>{
     if(!controller.classList.contains('editing')||!pointers.has(e.pointerId))return;
-    e.preventDefault();e.stopPropagation();pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});queueUpdate();
+    e.preventDefault();e.stopImmediatePropagation();
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});queue();
   },{capture:true,passive:false});
-
   const finish=e=>{
     if(!pointers.has(e.pointerId))return;
-    if(controller.classList.contains('editing')){e.preventDefault();e.stopPropagation();}
+    if(controller.classList.contains('editing')){e.preventDefault();e.stopImmediatePropagation();}
     pointers.delete(e.pointerId);
-    if(!pointers.size){if(active)active.el.classList.remove('precision-active');active=null;save();}
-    else rebaseToRemainingPointer();
+    if(!pointers.size){active?.el.classList.remove('precision-active');active=null;save();}
+    else rebaseDrag();
   };
   canvas.addEventListener('pointerup',finish,{capture:true,passive:false});
   canvas.addEventListener('pointercancel',finish,{capture:true,passive:false});
   canvas.addEventListener('lostpointercapture',finish,{capture:true,passive:false});
 
-  const observer=new MutationObserver(()=>{
-    if(controller.classList.contains('editing')){showToast();canvas.style.touchAction='none';controls.forEach(el=>{el.style.touchAction='none';el.classList.add('precision-editable');});}
-    else{hideToast();pointers.clear();if(active)active.el.classList.remove('precision-active');active=null;canvas.style.touchAction='';controls.forEach(el=>el.classList.remove('precision-active','precision-editable'));save();}
-  });observer.observe(controller,{attributes:true,attributeFilter:['class']});
+  function syncEditingState(){
+    disableLegacyGroupEditor();
+    const editing=controller.classList.contains('editing');
+    if(editing){showToast();canvas.style.touchAction='none';controls.forEach(el=>{el.style.touchAction='none';el.classList.add('precision-editable');});}
+    else{hideToast();pointers.clear();active?.el.classList.remove('precision-active');active=null;canvas.style.touchAction='';controls.forEach(el=>el.classList.remove('precision-active','precision-editable'));save();}
+  }
+  new MutationObserver(syncEditingState).observe(controller,{attributes:true,attributeFilter:['class']});
 
-  document.getElementById('layoutReset')?.addEventListener('click',()=>{state=defaults();save();applyAll();});
+  document.getElementById('layoutReset')?.addEventListener('click',()=>setTimeout(()=>{
+    // After app-v3 restores its parent defaults, recapture clean per-control defaults.
+    controls.forEach(el=>el.style.transform='none');defaultsState=readNaturalCenters();state=JSON.parse(JSON.stringify(defaultsState));save();applyAll();
+  },0));
   document.getElementById('layoutSave')?.addEventListener('click',save);
   document.getElementById('layoutDone')?.addEventListener('click',save);
-  window.addEventListener('orientationchange',()=>setTimeout(()=>{state=load();applyAll();},180));
-  window.addEventListener('resize',()=>{if(!controller.classList.contains('editing'))applyAll();});
-  applyAll();
+
+  function reflow(){
+    clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{
+      disableLegacyGroupEditor();
+      if(!Object.keys(defaultsState).length)defaultsState=readNaturalCenters();
+      const stored=load();state=stored;applyAll();
+    },120);
+  }
+  window.addEventListener('orientationchange',reflow);
+  window.addEventListener('resize',()=>{if(!controller.classList.contains('editing'))reflow();});
+
+  disableLegacyGroupEditor();
+  controls.forEach(el=>el.style.transform='none');
+  defaultsState=readNaturalCenters();
+  state=load();applyAll();syncEditingState();
 })();
