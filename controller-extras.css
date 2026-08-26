@@ -2,7 +2,7 @@
 .controller-menu-key{position:absolute;right:3.5%;top:5%;z-index:8;width:54px;height:46px;padding:9px 11px;border:1px solid #3a4352;border-radius:14px;background:#171c25;box-shadow:inset 0 -3px 0 rgba(0,0,0,.28),0 6px 18px rgba(0,0,0,.25);display:flex;flex-direction:column;justify-content:center;gap:5px;touch-action:none;-webkit-tap-highlight-color:transparent}
 .controller-menu-key span{display:block;width:100%;height:3px;border-radius:999px;background:#f2f4f8;pointer-events:none}
 .v5-flat-control.controller-menu-key{position:relative!important;inset:auto!important;right:auto!important;top:auto!important;width:100%!important;height:100%!important;margin:0!important}
-.retro-menu-relocated,.fixed-stage .retro-fallback-menu-button{display:none!important;visibility:hidden!important;pointer-events:none!important}
+.retro-menu-relocated{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
 /* Direction-control visibility. All controls remain in the v7 layout database even when hidden. */
 html[data-direction-mode="stick"] .v5-control-shell[data-v5-control="up"],
@@ -11,7 +11,7 @@ html[data-direction-mode="stick"] .v5-control-shell[data-v5-control="left"],
 html[data-direction-mode="stick"] .v5-control-shell[data-v5-control="right"]{display:none!important}
 html[data-direction-mode="dpad"] .v5-control-shell[data-v5-control="stick"]{display:none!important}
 
-/* Before v7 flattening, keep the same visibility if the page is still initializing. */
+/* Before v7 flattening, keep geometry while hiding the unused direction control. */
 html[data-direction-mode="stick"] .unit-dpad{visibility:hidden}
 html[data-direction-mode="dpad"] .unit-stick{visibility:hidden}
 
