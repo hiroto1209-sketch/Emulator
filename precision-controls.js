@@ -6,7 +6,7 @@
 
   const VERSION=7, PREFIX='retro-pocket-precision-layout-v7-';
   const pointers=new Map(), shells=[];
-  let state={}, defaults={}, active=null, raf=0, toast=null, initialized=false, resizeTimer=0;
+  let state={}, defaults={}, active=null, raf=0, toast=null, confirmButton=null, initialized=false, resizeTimer=0;
   const orientation=()=>matchMedia('(orientation: landscape)').matches?'landscape':'portrait';
   const key=()=>PREFIX+orientation();
   const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -100,10 +100,22 @@
   const end=e=>{if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(!pointers.size){active?.s.classList.remove('precision-active');active=null;fitAll();save();}else rebase();};
   canvas.addEventListener('pointerup',end,{capture:true});canvas.addEventListener('pointercancel',end,{capture:true});canvas.addEventListener('lostpointercapture',end,{capture:true});
 
+  function ensureConfirm(){
+    if(confirmButton?.isConnected)return confirmButton;
+    confirmButton=document.createElement('button');confirmButton.type='button';confirmButton.className='precision-edit-confirm';confirmButton.textContent='変更を確定';
+    confirmButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fitAll();save();document.getElementById('layoutDone')?.click();});
+    document.body.appendChild(confirmButton);return confirmButton;
+  }
+
   function sync(){
     if(!initialized)return;disableLegacy();const on=controller.classList.contains('editing');
-    if(on){canvas.style.touchAction='none';shells.forEach(s=>s.classList.add('precision-editable'));if(!toast){toast=document.createElement('div');toast.className='precision-edit-toast';toast.textContent='1本指で移動 ・ 2本指でサイズ変更';document.body.appendChild(toast);}}
-    else{canvas.style.touchAction='';shells.forEach(s=>s.classList.remove('precision-editable','precision-active'));toast?.remove();toast=null;pointers.clear();active=null;fitAll();save();}
+    document.body.classList.toggle('layout-edit-active',on);
+    if(on){
+      ensureConfirm();canvas.style.touchAction='none';shells.forEach(s=>s.classList.add('precision-editable'));
+      if(!toast){toast=document.createElement('div');toast.className='precision-edit-toast';toast.textContent='1本指で移動 ・ 2本指でサイズ変更';document.body.appendChild(toast);}
+    }else{
+      canvas.style.touchAction='';shells.forEach(s=>s.classList.remove('precision-editable','precision-active'));toast?.remove();toast=null;pointers.clear();active=null;fitAll();save();
+    }
   }
   new MutationObserver(sync).observe(controller,{attributes:true,attributeFilter:['class']});
 
