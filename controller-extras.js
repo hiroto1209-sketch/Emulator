@@ -7,82 +7,39 @@
   let mode=localStorage.getItem(MODE_KEY)||'both';
   if(!VALID.has(mode))mode='both';
 
-  function openMenu(){
-    $('gameMenuDrawer')?.classList.remove('hidden');
-    $('menuBackdrop')?.classList.remove('hidden');
-    document.body.classList.add('menu-open');
-  }
+  function openMenu(){$('gameMenuDrawer')?.classList.remove('hidden');$('menuBackdrop')?.classList.remove('hidden');document.body.classList.add('menu-open');}
+  $('controllerMenuButton')?.addEventListener('click',e=>{if($('snesController')?.classList.contains('editing'))return;e.preventDefault();e.stopPropagation();openMenu();});
 
-  const menuButton=$('controllerMenuButton');
-  menuButton?.addEventListener('click',e=>{
-    if($('snesController')?.classList.contains('editing'))return;
-    e.preventDefault();e.stopPropagation();openMenu();
-  });
-
-  function shouldRelocateMenu(){return !document.body.classList.contains('custom-pad-off');}
-  function hideGameMenuButtons(){
-    const relocate=shouldRelocateMenu();
-    document.querySelectorAll('.retro-fallback-menu-button').forEach(el=>el.classList.toggle('retro-menu-relocated',relocate));
+  function hideNativeMenuOnce(){
     const root=$('game');if(!root)return;
-    [...root.querySelectorAll('button,[role="button"],div')].forEach(el=>{
+    const candidates=root.querySelectorAll('button,[role="button"],[aria-label*="menu" i],[aria-label*="setting" i],[title*="menu" i],[title*="setting" i]');
+    candidates.forEach(el=>{
       if(el.classList.contains('retro-native-menu-entry'))return;
       const r=el.getBoundingClientRect?.();if(!r||r.width<24||r.height<24||r.width>100||r.height>100)return;
       const label=`${el.getAttribute?.('aria-label')||''} ${el.getAttribute?.('title')||''}`.toLowerCase();
-      const text=(el.textContent||'').trim();
-      const bars=el.querySelectorAll?.('span,div')?.length||0;
-      if(label.includes('menu')||label.includes('setting')||(text.length===0&&bars>=3))el.classList.toggle('retro-menu-relocated',relocate);
+      const text=(el.textContent||'').trim();const bars=el.querySelectorAll?.('span,div')?.length||0;
+      if(label.includes('menu')||label.includes('setting')||(text.length===0&&bars>=3))el.classList.add('retro-menu-relocated');
     });
   }
-  const game=$('game');
-  if(game)new MutationObserver(()=>requestAnimationFrame(hideGameMenuButtons)).observe(game,{childList:true,subtree:true});
-  new MutationObserver(()=>requestAnimationFrame(hideGameMenuButtons)).observe(document.body,{attributes:true,attributeFilter:['class']});
-  [0,250,700,1500,3000,6000].forEach(ms=>setTimeout(hideGameMenuButtons,ms));
+  [700,1800,4000].forEach(ms=>setTimeout(hideNativeMenuOnce,ms));
 
-  function modeLabel(v){return v==='stick'?'スティック':v==='dpad'?'十字キー':'両方';}
+  const modeLabel=v=>v==='stick'?'スティック':v==='dpad'?'十字キー':'両方';
   function syncDirectionMode(){
     ROOT.dataset.directionMode=mode;
-    const b=$('directionModeToggle');
-    if(b){
-      let s=b.querySelector('span'),strong=b.querySelector('b');
-      if(!s||!strong){b.innerHTML='<span></span><b></b>';s=b.querySelector('span');strong=b.querySelector('b');}
-      s.textContent='方向操作';strong.textContent=modeLabel(mode);
-    }
+    const b=$('directionModeToggle');if(b){let s=b.querySelector('span'),strong=b.querySelector('b');if(!s||!strong){b.innerHTML='<span></span><b></b>';s=b.querySelector('span');strong=b.querySelector('b');}s.textContent='方向操作';strong.textContent=modeLabel(mode);}
     window.dispatchEvent(new CustomEvent('retro-direction-mode-change',{detail:{mode}}));
   }
-  $('directionModeToggle')?.addEventListener('click',()=>{
-    mode=mode==='stick'?'dpad':mode==='dpad'?'both':'stick';
-    localStorage.setItem(MODE_KEY,mode);syncDirectionMode();
-  });
+  $('directionModeToggle')?.addEventListener('click',()=>{mode=mode==='stick'?'dpad':mode==='dpad'?'both':'stick';localStorage.setItem(MODE_KEY,mode);syncDirectionMode();});
   syncDirectionMode();
 
-  function removeEnglishStudy(){
-    document.querySelectorAll('#englishStudyEntry,#englishStudyButton,[data-english-study],.english-study-entry').forEach(el=>el.remove());
-    document.querySelectorAll('#gameMenuDrawer button').forEach(b=>{if(/英語学習/.test(b.textContent||''))b.remove();});
-  }
-  const drawer=$('gameMenuDrawer');
-  if(drawer)new MutationObserver(removeEnglishStudy).observe(drawer,{childList:true,subtree:true});
-  removeEnglishStudy();
-
   const restart=$('reloadGame');
-  if(restart){
-    restart.onclick=e=>{
-      e?.preventDefault?.();
-      try{sessionStorage.setItem(RESTART_KEY,'1');}catch{}
-      location.reload();
-    };
-  }
+  if(restart)restart.onclick=e=>{e?.preventDefault?.();try{sessionStorage.setItem(RESTART_KEY,'1');}catch{}location.reload();};
 
   async function resumeRestart(){
-    let requested=false;
-    try{requested=sessionStorage.getItem(RESTART_KEY)==='1';if(requested)sessionStorage.removeItem(RESTART_KEY);}catch{}
+    let requested=false;try{requested=sessionStorage.getItem(RESTART_KEY)==='1';if(requested)sessionStorage.removeItem(RESTART_KEY);}catch{}
     if(!requested)return;
     for(let i=0;i<40;i++){
-      try{
-        if(typeof window.loadCachedRom==='function'&&typeof window.bootRom==='function'){
-          const file=await window.loadCachedRom();
-          if(file){window.bootRom(file,{fromCache:true,autoState:false});return;}
-        }
-      }catch{}
+      try{if(typeof window.loadCachedRom==='function'&&typeof window.bootRom==='function'){const file=await window.loadCachedRom();if(file){window.bootRom(file,{fromCache:true,autoState:false});return;}}}catch{}
       await new Promise(r=>setTimeout(r,100));
     }
     const b=$('continueGame');if(b&&!b.classList.contains('hidden'))b.click();
