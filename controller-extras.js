@@ -19,8 +19,10 @@
     e.preventDefault();e.stopPropagation();openMenu();
   });
 
+  function shouldRelocateMenu(){return !document.body.classList.contains('custom-pad-off');}
   function hideGameMenuButtons(){
-    document.querySelectorAll('.retro-fallback-menu-button').forEach(el=>el.classList.add('retro-menu-relocated'));
+    const relocate=shouldRelocateMenu();
+    document.querySelectorAll('.retro-fallback-menu-button').forEach(el=>el.classList.toggle('retro-menu-relocated',relocate));
     const root=$('game');if(!root)return;
     [...root.querySelectorAll('button,[role="button"],div')].forEach(el=>{
       if(el.classList.contains('retro-native-menu-entry'))return;
@@ -28,11 +30,12 @@
       const label=`${el.getAttribute?.('aria-label')||''} ${el.getAttribute?.('title')||''}`.toLowerCase();
       const text=(el.textContent||'').trim();
       const bars=el.querySelectorAll?.('span,div')?.length||0;
-      if(label.includes('menu')||label.includes('setting')||(text.length===0&&bars>=3))el.classList.add('retro-menu-relocated');
+      if(label.includes('menu')||label.includes('setting')||(text.length===0&&bars>=3))el.classList.toggle('retro-menu-relocated',relocate);
     });
   }
   const game=$('game');
   if(game)new MutationObserver(()=>requestAnimationFrame(hideGameMenuButtons)).observe(game,{childList:true,subtree:true});
+  new MutationObserver(()=>requestAnimationFrame(hideGameMenuButtons)).observe(document.body,{attributes:true,attributeFilter:['class']});
   [0,250,700,1500,3000,6000].forEach(ms=>setTimeout(hideGameMenuButtons,ms));
 
   function modeLabel(v){return v==='stick'?'スティック':v==='dpad'?'十字キー':'両方';}
