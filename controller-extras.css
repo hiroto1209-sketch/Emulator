@@ -4,6 +4,16 @@
 .v5-flat-control.controller-menu-key{position:relative!important;inset:auto!important;right:auto!important;top:auto!important;width:100%!important;height:100%!important;margin:0!important}
 .retro-menu-relocated{display:none!important;visibility:hidden!important;pointer-events:none!important}
 
+/* Stage menu is always available. When only the native pad is visible, place it between L/R. */
+.fixed-stage .retro-fallback-menu-button{display:flex!important;visibility:visible!important;pointer-events:auto!important}
+.native-pad-on.custom-pad-off .fixed-stage .retro-fallback-menu-button{left:50%!important;right:auto!important;top:58%!important;transform:translate(-50%,-50%)!important}
+.native-pad-off .fixed-stage .retro-fallback-menu-button,
+.custom-pad-on .fixed-stage .retro-fallback-menu-button{left:auto!important;right:12px!important;top:12px!important;transform:none!important}
+
+/* Fixed confirmation is deliberately outside layoutCanvas, so it can never become draggable. */
+.precision-edit-confirm{position:fixed;z-index:2147483004;right:max(14px,env(safe-area-inset-right));bottom:calc(env(safe-area-inset-bottom) + 14px);min-width:132px;height:48px;padding:0 18px;border:1px solid rgba(255,255,255,.2);border-radius:15px;background:#f4f6fa;color:#090b10;font-weight:950;font-size:14px;box-shadow:0 14px 38px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent}
+body:not(.layout-edit-active) .precision-edit-confirm{display:none!important}
+
 /* Direction-control visibility. All controls remain in the v7 layout database even when hidden. */
 html[data-direction-mode="stick"] .v5-control-shell[data-v5-control="up"],
 html[data-direction-mode="stick"] .v5-control-shell[data-v5-control="down"],
@@ -15,4 +25,4 @@ html[data-direction-mode="dpad"] .v5-control-shell[data-v5-control="stick"]{disp
 html[data-direction-mode="stick"] .unit-dpad{visibility:hidden}
 html[data-direction-mode="dpad"] .unit-stick{visibility:hidden}
 
-@media(max-width:600px) and (orientation:portrait){.controller-menu-key{width:50px;height:43px;right:4%;top:4%}}
+@media(max-width:600px) and (orientation:portrait){.controller-menu-key{width:50px;height:43px;right:4%;top:4%}.precision-edit-confirm{right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);height:46px;min-width:122px}}
