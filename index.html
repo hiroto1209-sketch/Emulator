@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="single-screen.css" />
   <link rel="stylesheet" href="precision-controls.css" />
   <link rel="stylesheet" href="controller-extras.css" />
-  <link rel="stylesheet" href="live-subtitles-v2.css" />
 </head>
 <body>
   <main class="shell">
@@ -47,70 +46,22 @@
       </div>
 
       <div class="resume-banner hidden" id="resumeBanner"><strong>ゲームを再開しました</strong><button id="resumeNow" type="button">再開</button></div>
-
       <div class="menu-backdrop hidden" id="menuBackdrop"></div>
       <aside class="game-menu-drawer hidden" id="gameMenuDrawer" aria-label="Retro Pocket 設定">
         <div class="drawer-head"><div><small>RETRO POCKET</small><strong id="menuGameTitle">ゲーム設定</strong><p>プレイに必要な機能をここに集約</p></div><button id="gameMenuClose" type="button" aria-label="閉じる">×</button></div>
-
-        <section class="menu-group menu-group-quick">
-          <div class="menu-group-label"><span>クイック操作</span><small>よく使う機能</small></div>
-          <div class="quick-menu-grid">
-            <button id="nativePadToggle" type="button"><span>画面内パッド</span><b>OFF</b></button>
-            <button id="customPadToggle" type="button"><span>下部パッド</span><b>ON</b></button>
-            <button id="directionModeToggle" type="button"><span>方向操作</span><b>両方</b></button>
-            <button id="turboToggle" type="button"><span>連打</span><b>OFF</b></button>
-            <button id="fastForwardToggle" type="button"><span>ゲーム速度</span><b>2倍速</b></button>
-          </div>
-        </section>
-
-        <section class="menu-group">
-          <div class="menu-group-label"><span>ゲーム機能</span><small>保存・チート・操作</small></div>
-          <div class="feature-menu-list">
-            <button id="savePanelToggle" type="button"><span><b>保存 / 読込</b><small>3つのスロットと自動復帰</small></span><i>›</i></button>
-            <button id="cheatPanelToggle" type="button"><span><b>チート</b><small>ワンタップでON / OFF</small></span><i>›</i></button>
-            <button id="layoutEditToggle" type="button"><span><b>操作配置</b><small>移動・ピンチで個別サイズ変更</small></span><i>›</i></button>
-            <button id="reloadGame" type="button"><span><b>ゲーム再起動</b><small>現在のROMを最初から再起動</small></span><i>↻</i></button>
-          </div>
-        </section>
-
-        <section class="menu-section hidden" id="savePanel">
-          <div class="menu-section-title"><strong>保存ステート</strong><small>ゲームの好きな瞬間を保存・復元</small></div>
-          <div class="save-grid">
-            <article><strong>スロット 1</strong><small id="slotStatus1">未保存</small><div><button data-save-slot="1">保存</button><button data-load-slot="1">読込</button></div></article>
-            <article><strong>スロット 2</strong><small id="slotStatus2">未保存</small><div><button data-save-slot="2">保存</button><button data-load-slot="2">読込</button></div></article>
-            <article><strong>スロット 3</strong><small id="slotStatus3">未保存</small><div><button data-save-slot="3">保存</button><button data-load-slot="3">読込</button></div></article>
-          </div>
-          <button class="wide-action" id="loadAutoResume" type="button">直前の自動復帰ポイントを読み込む</button>
-        </section>
-
-        <section class="menu-section hidden" id="cheatPanel">
-          <div class="menu-section-title"><strong>ワンタップ・チート</strong><small>タップするだけでON/OFF</small></div>
-          <div class="cheat-grid" id="cheatGrid"></div>
-          <button class="wide-action danger-lite" id="disableAllCheats" type="button">チートをすべてOFF</button>
-        </section>
-
-        <section class="menu-section hidden" id="layoutPanel">
-          <div class="menu-section-title"><strong>操作配置の編集</strong><small id="orientationLabel">縦画面用</small></div>
-          <div class="gesture-guide"><div><b>1本指</b><span>各ボタンをドラッグして移動</span></div><div><b>2本指</b><span>ピンチでそのボタンだけ拡大・縮小</span></div></div>
-          <p class="panel-note">L/R、方向キー4つ、A/B/X/Y、選択、開始、スティック、設定ボタンを個別調整できます。縦画面と横画面は別々に保存されます。</p>
-          <label class="size-control">全体サイズ <input id="controllerScale" type="range" min="70" max="135" value="100" step="5"><span id="scaleValue">100%</span></label>
-          <div class="layout-actions"><button id="layoutReset" type="button">すべて初期配置</button><button id="layoutSave" class="primary-mini" type="button">配置を保存</button></div>
-          <button class="wide-action" id="layoutDone" type="button">編集を終了</button>
-        </section>
-
-        <section class="menu-group system-menu">
-          <div class="menu-group-label"><span>その他</span><small>ゲームデータ</small></div>
-          <div class="drawer-actions"><button id="changeRom" type="button">別のゲーム</button><button id="backToLibrary" type="button">ライブラリ</button></div>
-        </section>
+        <section class="menu-group menu-group-quick"><div class="menu-group-label"><span>クイック操作</span><small>よく使う機能</small></div><div class="quick-menu-grid"><button id="nativePadToggle" type="button"><span>画面内パッド</span><b>OFF</b></button><button id="customPadToggle" type="button"><span>下部パッド</span><b>ON</b></button><button id="directionModeToggle" type="button"><span>方向操作</span><b>両方</b></button><button id="turboToggle" type="button"><span>連打</span><b>OFF</b></button><button id="fastForwardToggle" type="button"><span>ゲーム速度</span><b>2倍速</b></button></div></section>
+        <section class="menu-group"><div class="menu-group-label"><span>ゲーム機能</span><small>保存・チート・操作</small></div><div class="feature-menu-list"><button id="savePanelToggle" type="button"><span><b>保存 / 読込</b><small>3つのスロットと自動復帰</small></span><i>›</i></button><button id="cheatPanelToggle" type="button"><span><b>チート</b><small>ワンタップでON / OFF</small></span><i>›</i></button><button id="layoutEditToggle" type="button"><span><b>操作配置</b><small>移動・ピンチで個別サイズ変更</small></span><i>›</i></button><button id="reloadGame" type="button"><span><b>ゲーム再起動</b><small>現在のROMを最初から再起動</small></span><i>↻</i></button></div></section>
+        <section class="menu-section hidden" id="savePanel"><div class="menu-section-title"><strong>保存ステート</strong><small>ゲームの好きな瞬間を保存・復元</small></div><div class="save-grid"><article><strong>スロット 1</strong><small id="slotStatus1">未保存</small><div><button data-save-slot="1">保存</button><button data-load-slot="1">読込</button></div></article><article><strong>スロット 2</strong><small id="slotStatus2">未保存</small><div><button data-save-slot="2">保存</button><button data-load-slot="2">読込</button></div></article><article><strong>スロット 3</strong><small id="slotStatus3">未保存</small><div><button data-save-slot="3">保存</button><button data-load-slot="3">読込</button></div></article></div><button class="wide-action" id="loadAutoResume" type="button">直前の自動復帰ポイントを読み込む</button></section>
+        <section class="menu-section hidden" id="cheatPanel"><div class="menu-section-title"><strong>ワンタップ・チート</strong><small>タップするだけでON/OFF</small></div><div class="cheat-grid" id="cheatGrid"></div><button class="wide-action danger-lite" id="disableAllCheats" type="button">チートをすべてOFF</button></section>
+        <section class="menu-section hidden" id="layoutPanel"><div class="menu-section-title"><strong>操作配置の編集</strong><small id="orientationLabel">縦画面用</small></div><div class="gesture-guide"><div><b>1本指</b><span>各ボタンをドラッグして移動</span></div><div><b>2本指</b><span>ピンチでそのボタンだけ拡大・縮小</span></div></div><p class="panel-note">L/R、方向キー4つ、A/B/X/Y、選択、開始、スティック、設定ボタンを個別調整できます。縦画面と横画面は別々に保存されます。</p><label class="size-control">全体サイズ <input id="controllerScale" type="range" min="70" max="135" value="100" step="5"><span id="scaleValue">100%</span></label><div class="layout-actions"><button id="layoutReset" type="button">すべて初期配置</button><button id="layoutSave" class="primary-mini" type="button">配置を保存</button></div><button class="wide-action" id="layoutDone" type="button">編集を終了</button></section>
+        <section class="menu-group system-menu"><div class="menu-group-label"><span>その他</span><small>ゲームデータ</small></div><div class="drawer-actions"><button id="changeRom" type="button">別のゲーム</button><button id="backToLibrary" type="button">ライブラリ</button></div></section>
       </aside>
     </section>
-
     <footer>Retro Pocket · 個人用エミュレーターフロントエンド</footer>
   </main>
   <script src="app-v3.js"></script>
   <script src="single-screen.js"></script>
   <script src="precision-controls.js"></script>
   <script src="controller-extras.js"></script>
-  <script src="live-subtitles-v2.js"></script>
 </body>
 </html>
