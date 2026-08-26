@@ -3,9 +3,18 @@
   const ROOT=document.documentElement;
   const MODE_KEY='retro-pocket-direction-mode-v1';
   const RESTART_KEY='retro-pocket-restart-current-rom-v1';
+  const CLEANUP_KEY='retro-pocket-study-cleanup-v1';
   const VALID=new Set(['stick','dpad','both']);
   let mode=localStorage.getItem(MODE_KEY)||'both';
   if(!VALID.has(mode))mode='both';
+
+  function purgeRetiredStudyData(){
+    if(localStorage.getItem(CLEANUP_KEY)==='1')return;
+    try{indexedDB.deleteDatabase('retro-pocket-study-db');}catch{}
+    try{[...Array(localStorage.length)].forEach((_,i)=>{const k=localStorage.key(i);if(k&&/(english.?study|subtitle|simple.?subtitles|live.?study)/i.test(k))localStorage.removeItem(k);});}catch{}
+    localStorage.setItem(CLEANUP_KEY,'1');
+  }
+  purgeRetiredStudyData();
 
   function openMenu(){$('gameMenuDrawer')?.classList.remove('hidden');$('menuBackdrop')?.classList.remove('hidden');document.body.classList.add('menu-open');}
   $('controllerMenuButton')?.addEventListener('click',e=>{if($('snesController')?.classList.contains('editing'))return;e.preventDefault();e.stopPropagation();openMenu();});
