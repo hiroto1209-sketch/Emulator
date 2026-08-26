@@ -33,7 +33,7 @@
   function syncFallbackMenu(){
     const b=ensureFallbackButton();if(!b)return;
     const playing=player&&!player.classList.contains('hidden');
-    b.classList.toggle('hidden',!playing||customPadVisible);
+    b.classList.toggle('hidden',!playing);
   }
 
   function syncPlayerMode(){
@@ -58,6 +58,9 @@
   function applyPadVisibility(){
     gameRoot?.classList.toggle('retro-native-pad-off',!nativePadVisible);
     document.body.classList.toggle('custom-pad-off',!customPadVisible);
+    document.body.classList.toggle('custom-pad-on',customPadVisible);
+    document.body.classList.toggle('native-pad-on',nativePadVisible);
+    document.body.classList.toggle('native-pad-off',!nativePadVisible);
     nativePadToggle?.classList.toggle('active',nativePadVisible);customPadToggle?.classList.toggle('active',customPadVisible);
     setStructuredToggle(nativePadToggle,'画面内パッド',nativePadVisible?'ON':'OFF');
     setStructuredToggle(customPadToggle,'下部パッド',customPadVisible?'ON':'OFF');
@@ -75,8 +78,6 @@
   if(player)new MutationObserver(syncPlayerMode).observe(player,{attributes:true,attributeFilter:['class']});
   syncPlayerMode();ensureFallbackButton();applyPadVisibility();setStructuredToggle(turbo,'連打','OFF');
 
-  // EmulatorJS creates its native controls after boot. A few lightweight passes are enough;
-  // there is intentionally no whole-game MutationObserver here.
   [700,1800,4000].forEach(ms=>setTimeout(()=>{if(!nativePadVisible)hideNativeVirtualControls();},ms));
   window.addEventListener('orientationchange',()=>setTimeout(()=>{if(document.body.classList.contains('player-active'))window.scrollTo(0,0);syncFallbackMenu();},80));
 })();
