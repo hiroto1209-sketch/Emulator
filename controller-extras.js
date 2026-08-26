@@ -73,11 +73,16 @@
     let requested=false;
     try{requested=sessionStorage.getItem(RESTART_KEY)==='1';if(requested)sessionStorage.removeItem(RESTART_KEY);}catch{}
     if(!requested)return;
-    for(let i=0;i<30;i++){
-      const b=$('continueGame');
-      if(b&&!b.classList.contains('hidden')){b.click();return;}
-      await new Promise(r=>setTimeout(r,120));
+    for(let i=0;i<40;i++){
+      try{
+        if(typeof window.loadCachedRom==='function'&&typeof window.bootRom==='function'){
+          const file=await window.loadCachedRom();
+          if(file){window.bootRom(file,{fromCache:true,autoState:false});return;}
+        }
+      }catch{}
+      await new Promise(r=>setTimeout(r,100));
     }
+    const b=$('continueGame');if(b&&!b.classList.contains('hidden'))b.click();
   }
   window.addEventListener('load',()=>setTimeout(resumeRestart,80),{once:true});
 })();
